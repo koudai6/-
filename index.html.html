@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>白雾 · 聊天</title>
+<!-- ====== PWA 配置开始 ====== -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" type="image/png" href="icon-192.PNG">
+<link rel="apple-touch-icon" href="icon-192.PNG">
+<!-- ====== PWA 配置结束 ====== -->
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;touch-action:manipulation;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;color:#292929;background:#fff;-webkit-text-size-adjust:100%}
+button,textarea,input{font:inherit}
+button{border:0;background:none;color:inherit;cursor:pointer}
+.app{height:100dvh;max-width:760px;margin:auto;display:flex;flex-direction:column;overflow:hidden;background:white;position:relative;touch-action:pan-y}
+.top{flex:none;position:relative;z-index:2;height:100px;padding:6px 12px 8px;background:#fffffff0;backdrop-filter:blur(20px);border-bottom:1px solid #f0f0f0;display:grid;grid-template-columns:36px 1fr 36px;align-items:center}
+.top button{font-size:26px;color:#555}
+.top #more{font-size:22px;letter-spacing:1.5px;color:#666}
+.person{display:flex;align-items:center;flex-direction:column;gap:2px}
+.avatar{width:36px;height:36px;border-radius:50%;background:#f0f0f0;display:grid;place-items:center;color:#bbb;font-size:22px;overflow:hidden}
+.avatar img,.ava img{width:100%;height:100%;object-fit:cover}
+.pname{font-size:15px;font-weight:650;color:#1a1a1a;line-height:1.2}
+.pid{font-size:11px;font-weight:400;color:#a0a0a0;margin-top:1px}
+.chat{flex:1;min-height:0;overflow:auto;padding:16px 12px;background:linear-gradient(#fff,#fcfcfc)}
+.date{text-align:center;font-size:12px;color:#c0c0c0;margin:4px 0 22px}
+.row{display:flex;align-items:flex-start;gap:5px;margin:7px 0}
+.row.mine{justify-content:flex-end}
+.avatar-stack{width:34px;flex:none;display:flex;flex-direction:column;align-items:center;gap:6px}
+.ava{width:34px;height:34px;border-radius:50%;background:#f0f0f0;display:grid;place-items:center;font-size:14px;color:#bbb;flex:none;overflow:hidden}
+.avatar-time{font-size:8px;line-height:1.1;color:#c8c8c8;white-space:nowrap;margin-top:1px}
+
+/* 半透明磨砂气泡 */
+.bubble{max-width:72%;padding:7px 11px;border-radius:16px;border:1px solid rgba(255,255,255,0.7);background:rgba(255,255,255,0.55);backdrop-filter:blur(20px) saturate(1.8);-webkit-backdrop-filter:blur(20px) saturate(1.8);box-shadow:0 4px 14px rgba(0,0,0,0.03);font-size:14px;line-height:1.45;overflow-wrap:anywhere;white-space:pre-wrap;user-select:none}
+.mine .bubble{background:rgba(242,242,245,0.65);border-color:rgba(255,255,255,0.5);box-shadow:0 4px 14px rgba(0,0,0,0.04)}
+
+.bubble.sticker-bubble{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+.quote{padding:5px 7px;margin-bottom:6px;background:rgba(0,0,0,0.04);border-left:2px solid rgba(0,0,0,0.1);border-radius:6px;font-size:11px;color:#777}
+.quote b{display:block;font-size:10px;font-weight:500;color:#999;margin-bottom:2px}
+.msgimg{display:block;max-width:180px;max-height:220px;border-radius:8px}
+.sticker-img{display:block;max-width:84px;max-height:84px;border-radius:10px;cursor:pointer}
+.sticker-emoji{font-size:16px;line-height:1.4}
+.bubble.typing-bubble{padding:8px 12px;display:inline-flex;align-items:center;justify-content:center;gap:5px;min-width:48px;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);background:rgba(255,255,255,0.6)}
+.typing-bubble .dotting{width:7px;height:7px;border-radius:50%;background:#c8c8ce;display:inline-block;animation:typingBounce 1.15s infinite ease-in-out both}
+.typing-bubble .dotting:nth-child(1){animation-delay:0s}
+.typing-bubble .dotting:nth-child(2){animation-delay:.15s}
+.typing-bubble .dotting:nth-child(3){animation-delay:.3s}
+@keyframes typingBounce{0%{transform:translateY(0);opacity:.35}20%{transform:translateY(-6px);opacity:1}40%{transform:translateY(0);opacity:.6}100%{transform:translateY(0);opacity:.35}}
+
+.foot{flex:none;border-top:1px solid #eee;padding:10px 14px calc(10px + env(safe-area-inset-bottom));background:#fffffff2;backdrop-filter:blur(20px)}
+.reply{display:none;align-items:center;gap:8px;padding:6px 8px;margin-bottom:6px;background:#f8f8f8;border-radius:8px;border-left:2px solid #bbb;font-size:11px;color:#777}
+.reply.show{display:flex}
+.reply span{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.composer{display:flex;align-items:center;gap:8px}
+.tool{font-size:22px;color:#666;width:34px;height:38px;flex:none;display:grid;place-items:center}
+.entry{flex:1;min-width:0;min-height:40px;max-height:88px;resize:none;border:0;outline:0;border-radius:24px;background:#f5f5f5;padding:11px 14px;font-size:14px;line-height:18px;color:#333}
+.entry::placeholder{color:#bbb}
+.send{width:36px;height:36px;border-radius:50%;background:#333;color:white;font-size:18px;flex:none;display:grid;place-items:center}
+.file{display:none}
+.shade{position:fixed;inset:0;z-index:40;background:#0003;display:flex;align-items:center;justify-content:center;padding:20px}
+.settings-menu{width:min(340px,90vw);max-height:80vh;overflow:auto;border-radius:18px;background:#fffffff8;backdrop-filter:blur(28px);box-shadow:0 10px 32px #00000014;border:1px solid #f0f0f0;padding:6px 14px 12px}
+.settings-head{font-size:16px;font-weight:600;padding:14px 2px 12px;border-bottom:1px solid #f2f2f2;letter-spacing:.02em}
+.setting-row{width:100%;display:flex;align-items:center;gap:14px;text-align:left;padding:14px 2px;border-bottom:1px solid #f4f4f4;font-size:14px;color:#333}
+.setting-row:last-of-type{border-bottom:0}
+.setting-row small{display:block;color:#999;font-size:11px;margin-top:3px}
+.setting-row .symbol{width:32px;height:32px;text-align:center;display:grid;place-items:center;color:#555;flex:none}
+.setting-row .symbol svg{width:22px;height:22px;stroke:#555;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.setting-row.danger{color:#d44}
+.field{width:100%;padding:10px;border:1px solid #e5e5e5;border-radius:10px;background:#fafafa;margin:5px 0 11px;font-size:14px}
+.setting-label{font-size:12px;color:#777;margin-top:11px;display:block}
+.panel-button{padding:9px 13px;border-radius:10px;background:#f1f1f1;font-size:13px;margin:4px 5px 4px 0}
+.panel-button.primary{background:#333;color:#fff}
+.panel-button.danger{color:#d44}
+.hidden{display:none!important}
+.menu{width:min(310px,92vw);border-radius:16px;background:#fffffff0;backdrop-filter:blur(26px);box-shadow:0 8px 28px #0002;overflow:hidden;border:1px solid #ffffff}
+.preview{padding:11px 13px 8px;font-size:10px;color:#aaa;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-bottom:1px solid #eee}
+.actions{display:grid;grid-template-columns:repeat(4,1fr);padding:8px 5px}
+.actions button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 4px;font-size:12px;border-radius:8px;min-height:56px}
+.actions strong{font-size:18px;font-weight:400}
+.actions .danger{color:#d44}
+.cancel{width:100%;padding:11px;border-top:1px solid #eee;color:#777;font-size:12px}
+.toast{position:absolute;z-index:30;bottom:90px;left:50%;transform:translateX(-50%);background:#333d;color:white;border-radius:18px;padding:7px 12px;font-size:11px;white-space:nowrap}
+.icon-plus{width:22px;height:22px;border:1.6px solid #666;border-radius:50%;display:grid;place-items:center;font-size:15px;line-height:1;color:#666;font-weight:500}
+.icon-smile{width:24px;height:24px;display:block}
+.icon-smile svg{width:24px;height:24px;stroke:#333;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.icon-img{width:22px;height:22px;display:grid;place-items:center}
+.icon-img svg{width:20px;height:20px;stroke:#666;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.icon-send{width:18px;height:18px;display:block}
+.icon-send svg{width:18px;height:18px;fill:#fff}
+.icon-person{width:28px;height:28px;display:grid;place-items:center}
+.icon-person svg{width:26px;height:26px;fill:#bbb}
+.sticker-panel{display:none;padding:10px 0 4px;border-top:1px solid #eee;max-height:280px;overflow:auto}
+.sticker-panel.show{display:block}
+.sticker-tabs{display:flex;gap:6px;margin-bottom:10px;padding:0 2px}
+.sticker-tabs button{padding:6px 12px;border-radius:16px;font-size:12px;background:#f1f1f1;color:#555}
+.sticker-tabs button.active{background:#333;color:#fff}
+.sticker-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.sticker-item{position:relative;aspect-ratio:1;border-radius:10px;overflow:hidden;background:#f6f6f8;display:grid;place-items:center}
+.sticker-item img{width:100%;height:100%;object-fit:cover;cursor:pointer}
+
+.sticker-item .sticker-del{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.55);color:#fff;font-size:13px;line-height:1;display:grid;place-items:center;z-index:2;border:0;padding:0}
+.sticker-add{border:1.5px dashed #ccc;color:#999;font-size:28px;cursor:pointer;background:#fafafa}
+.sticker-toolbar{display:flex;justify-content:space-between;align-items:center;margin-top:10px;padding-top:8px;border-top:1px solid #eee}
+.sticker-toolbar button{font-size:12px;padding:6px 10px;border-radius:8px;background:#f1f1f1;color:#555}
+.emoji-row{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;padding:4px 0}
+.emoji-row button{font-size:24px;padding:6px;border-radius:8px}
+.cards-page{position:absolute;inset:0;z-index:15;background:#f7f7f9;display:none;flex-direction:column;overflow:hidden}
+.cards-page.show{display:flex}
+.cards-top{flex:none;padding:12px 16px 10px;background:#fff;border-bottom:1px solid #eee;display:flex;align-items:center;gap:10px}
+.cards-top .back{width:36px;height:36px;border-radius:50%;background:#f2f2f2;display:grid;place-items:center;font-size:20px;color:#333}
+.cards-top h1{flex:1;font-size:18px;font-weight:700;margin:0;display:flex;align-items:center;gap:8px}
+.cards-top h1 span{font-size:13px;font-weight:500;color:#999;background:#f0f0f0;padding:2px 8px;border-radius:10px}
+.cards-top .act{padding:7px 14px;border-radius:18px;font-size:13px;background:#f2f2f2;color:#333}
+.cards-top .act.primary{background:#1a1a1e;color:#fff}
+.cards-body{flex:1;overflow:auto;padding:12px 14px 100px}
+.search-box{display:flex;align-items:center;gap:8px;background:#fff;border-radius:12px;padding:10px 14px;margin-bottom:12px;border:1px solid #eee}
+.search-box input{flex:1;border:0;outline:0;font-size:15px;background:transparent}
+.search-box .ico{color:#aaa;font-size:16px}
+.filter-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:10px;scrollbar-width:none}
+.filter-row::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:7px 14px;border-radius:18px;font-size:13px;background:#fff;color:#555;border:1px solid #e8e8e8}
+.chip.active{background:#1a1a1e;color:#fff;border-color:#1a1a1e}
+.group-row{display:flex;gap:8px;overflow-x:auto;padding-bottom:12px;scrollbar-width:none}
+.group-row::-webkit-scrollbar{display:none}
+.gchip{flex:none;padding:6px 12px;border-radius:16px;font-size:12px;background:#fff;color:#555;border:1px solid #e8e8e8;display:flex;align-items:center;gap:5px}
+.gchip.active{background:#1a1a1e;color:#fff;border-color:#1a1a1e}
+.gchip .cnt{font-size:11px;opacity:.7}
+.gchip.disabled-group{opacity:.5}
+.action-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.action-row button{padding:8px 14px;border-radius:12px;font-size:13px;background:#fff;border:1px solid #e8e8e8;color:#333}
+.action-row button.primary{background:#1a1a1e;color:#fff;border-color:#1a1a1e}
+.card-list{display:flex;flex-direction:column;gap:8px}
+.card-item{display:flex;align-items:center;gap:12px;background:#fff;border-radius:14px;padding:12px 14px;border:1px solid #f0f0f0}
+.card-item.multi{padding-left:12px}
+.card-check{width:22px;height:22px;border-radius:50%;border:1.6px solid #ccc;flex:none;display:grid;place-items:center;font-size:12px;color:#fff}
+.card-check.on{background:#1a1a1e;border-color:#1a1a1e}
+.card-icon{width:40px;height:40px;border-radius:10px;background:#f5f5f5;display:grid;place-items:center;flex:none;overflow:hidden;font-size:18px;color:#888}
+.card-icon img{width:100%;height:100%;object-fit:cover}
+.card-main{flex:1;min-width:0}
+.card-main .title{font-size:14px;line-height:1.35;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.card-main .meta{font-size:11px;color:#999;margin-top:4px}
+.card-tools{display:flex;align-items:center;gap:6px;flex:none}
+.sw{width:42px;height:26px;border-radius:13px;background:#e5e5ea;position:relative;transition:.2s;flex:none}
+.sw.on{background:#34c759}
+.sw::after{content:'';position:absolute;top:2px;left:2px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 1px 3px #0002;transition:.2s}
+.sw.on::after{left:18px}
+.tool-btn{width:32px;height:32px;border-radius:8px;background:#f5f5f5;display:grid;place-items:center;font-size:14px;color:#666}
+.multi-bar{position:absolute;bottom:0;left:0;right:0;z-index:16;background:#fff;border-top:1px solid #eee;padding:12px 16px calc(12px + env(safe-area-inset-bottom));display:none;align-items:center;gap:10px;box-shadow:0 -4px 20px #0001}
+.multi-bar.show{display:flex}
+.multi-bar .sel-count{flex:1;font-size:14px;color:#555}
+.multi-bar button{padding:10px 16px;border-radius:12px;font-size:14px;background:#f2f2f2}
+.multi-bar button.danger{background:#ffebeb;color:#d44}
+.multi-bar button.primary{background:#1a1a1e;color:#fff}
+.modal-box{width:min(340px,92vw);background:#fff;border-radius:18px;padding:18px 16px 14px;box-shadow:0 12px 40px #0002;max-height:80vh;overflow:auto}
+.modal-box h3{margin:0 0 12px;font-size:16px;font-weight:650}
+.modal-box .field{margin:8px 0}
+.modal-box textarea.field{min-height:100px;resize:vertical;line-height:1.5}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px}
+.modal-actions button{padding:9px 16px;border-radius:10px;font-size:14px;background:#f2f2f2}
+.modal-actions button.primary{background:#1a1a1e;color:#fff}
+.modal-actions button.danger{background:#ffebeb;color:#d44}
+.empty-tip{text-align:center;padding:40px 20px;color:#aaa;font-size:14px}
+
+.lightbox{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.85);display:none;align-items:center;justify-content:center;padding:20px}
+.lightbox.show{display:flex}
+.lightbox img{max-width:100%;max-height:90vh;border-radius:8px;object-fit:contain}
+.lightbox .close-lb{position:absolute;top:16px;right:16px;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);color:#fff;font-size:22px;display:grid;place-items:center}
+
+/* 韩系 Ins 风 转账/红包 UI */
+.pay-card{width:200px;border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,0.04);border:1px solid #F0F0F0}
+.pay-card.transfer,.pay-card.redpacket{display:flex;flex-direction:column}
+.pay-card .pay-main{display:flex;align-items:center;gap:10px;padding:12px 14px;min-height:56px}
+.pay-card.transfer .pay-main{background:linear-gradient(135deg,#E8F0F8,#D5E1ED);color:#4B5D6F}
+.pay-card.redpacket .pay-main{background:linear-gradient(135deg,#FBEBE9,#F5D8D4);color:#9B5D55}
+.pay-card.transfer.done .pay-main{background:#F5F6F8;color:#A1A9B0}
+.pay-card.redpacket.done .pay-main{background:#F8F6F6;color:#B5A3A1}
+.pay-card .pay-icon{width:32px;height:32px;flex:none;display:grid;place-items:center;background:rgba(255,255,255,0.6);border-radius:8px;color:inherit}
+.pay-card .pay-icon svg{width:18px;height:18px}
+.pay-card .pay-info{flex:1;min-width:0}
+.pay-card .pay-info .pay-label{font-size:14px;font-weight:500;line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pay-card .pay-info .pay-sub{font-size:12px;font-weight:600;opacity:.85;margin-top:2px}
+.pay-card .pay-foot{padding:6px 14px;font-size:10px;color:#999;background:#fff;border-top:1px solid #F5F5F5}
+.pay-card.redpacket.closed{cursor:pointer}
+.pay-card.redpacket.closed .pay-main{background:linear-gradient(135deg,#FBEBE9,#F5D8D4);color:#9B5D55;min-height:64px;justify-content:center;flex-direction:column;gap:6px;padding:14px}
+.pay-card.redpacket.closed .pay-seal{width:26px;height:26px;border-radius:50%;background:linear-gradient(145deg,#F7ECD7,#E6D0A7);display:grid;place-items:center;font-size:12px;color:#A67C46;font-weight:600}
+.pay-card.redpacket.closed .pay-label{font-size:12px;text-align:center;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pay-actions{display:flex;background:#fff;border-top:1px solid #F0F0F0}
+.pay-actions button{flex:1;padding:8px;font-size:12px;color:#666;background:#fff;transition:background .2s}
+.pay-actions button:active{background:#f9f9f9}
+.pay-actions button+button{border-left:1px solid #F0F0F0}
+.pay-actions button.accept{color:#4B5D6F;font-weight:500}
+.pay-actions button.reject{color:#A1A9B0}
+.bubble.pay-bubble{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important;max-width:none;backdrop-filter:none!important;-webkit-backdrop-filter:none!important}
+
+/* 韩系拆红包弹窗 */
+.rp-overlay{position:fixed;inset:0;z-index:55;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;padding:24px}
+.rp-overlay.show{display:flex}
+.rp-open{width:min(240px,78vw);background:linear-gradient(180deg,#E8D5D2 0%,#E8D5D2 55%,#fff 55%);border-radius:16px;overflow:hidden;text-align:center;box-shadow:0 12px 40px #0003;color:#5C4B49}
+.rp-open .rp-top{padding:28px 16px 16px;color:#7A5F5C}
+.rp-open .rp-top .rp-from{font-size:13px;opacity:.9;margin-bottom:8px}
+.rp-open .rp-top .rp-amt{font-size:28px;font-weight:700;letter-spacing:1px}
+.rp-open .rp-top .rp-yuan{font-size:14px;margin-left:2px}
+.rp-open .rp-note{padding:16px;font-size:13px;color:#7A5F5C}
+.rp-open .rp-btns{display:flex;border-top:1px solid #F5EEEE;background:#fff}
+.rp-open .rp-btns button{flex:1;padding:14px;font-size:14px}
+.rp-open .rp-btns button.accept{color:#C27A73;font-weight:600}
+.rp-open .rp-btns button.reject{color:#A1A9B0;border-right:1px solid #F5EEEE}
+.rp-open .rp-close{position:absolute;bottom:-48px;left:50%;transform:translateX(-50%);width:36px;height:36px;border-radius:50%;border:1.5px solid #fff;color:#fff;font-size:20px;display:grid;place-items:center}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top" id="chatHeader">
+  <button id="back">‹</button>
+  <div class="person">
+    <div class="avatar" id="personAvatar">
+      <span class="icon-person"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"></path></svg></span>
+    </div>
+    <div class="pname" id="pname">对方</div>
+    <div class="pid" id="pid">ID: chat_id_001</div>
+  </div>
+  <button id="more">···</button>
+</header>
+<main class="chat" id="chat"><div class="date" id="date">10月18日</div></main>
+<footer class="foot" id="chatFoot">
+  <div class="reply" id="reply">
+    <span><b id="replyTitle">引用消息</b><br><i id="replyText"></i></span>
+    <button id="cancelReply">×</button>
+  </div>
+  <div class="composer">
+    <button class="tool" id="plus" aria-label="更多"><span class="icon-plus">+</span></button>
+    <textarea class="entry" id="entry" rows="1" placeholder="发送消息…" style="height: 40px;"></textarea>
+    <button class="tool" id="emoji" aria-label="表情包">
+      <span class="icon-smile">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><circle cx="9" cy="10" r="1.1" fill="#333" stroke="none"></circle><circle cx="15" cy="10" r="1.1" fill="#333" stroke="none"></circle><path d="M8.5 14.5c1.2 1.4 2.6 2 3.5 2s2.3-.6 3.5-2"></path></svg>
+      </span>
+    </button>
+    <button class="tool" id="image" aria-label="发送图片">
+      <span class="icon-img"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"></rect><circle cx="8.5" cy="10" r="1.5"></circle><path d="M21 15l-5-5L5 21"></path></svg></span>
+    </button>
+    <button class="send" id="send" aria-label="发送">
+      <span class="icon-send"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"></path></svg></span>
+    </button>
+  </div>
+  <div class="sticker-panel" id="stickerPanel">
+    <div id="stickerContent"></div>
+    <div class="sticker-toolbar">
+      <span style="font-size:12px;color:#999">点选发送 · ＋ 添加表情包</span>
+      <button id="closeSticker">关闭</button>
+    </div>
+  </div>
+  <input class="file" id="file" type="file" accept="image/*" multiple="">
+  <input class="file" id="stickerFile" type="file" accept="image/*" multiple="">
+</footer>
+
+<div class="cards-page" id="cardsPage">
+  <div class="cards-top">
+    <button class="back" id="cardsBack">‹</button>
+    <h1>字卡库 <span id="cardsCount">0</span></h1>
+    <button class="act" id="multiToggle">选择</button>
+    <button class="act primary" id="addCardBtn">＋</button>
+  </div>
+  <div class="cards-body" id="cardsBody">
+    <div class="search-box">
+      <span class="ico">⌕</span>
+      <input id="cardSearch" placeholder="搜索字卡" type="search">
+    </div>
+    <div class="filter-row" id="typeFilter">
+      <button class="chip active" data-type="all">全部</button>
+      <button class="chip" data-type="text">文字</button>
+      <button class="chip" data-type="emoji">Emoji</button>
+      <button class="chip" data-type="image">表情包</button>
+    </div>
+    <div class="group-row" id="groupFilter"></div>
+    <div class="action-row">
+      <button class="primary" id="addTextBtn">＋ 添加文字</button>
+      <button id="addGroupBtn">＋ 新建分组</button>
+      <button id="manageGroupBtn">分组管理</button>
+    </div>
+    <div class="card-list" id="cardList"></div>
+  </div>
+  <div class="multi-bar" id="multiBar">
+    <span class="sel-count" id="selCount">已选 0</span>
+    <button id="multiCancel">取消</button>
+    <button class="danger" id="multiDel">删除</button>
+    <button class="primary" id="multiMove">移到分组</button>
+  </div>
+</div>
+
+<div class="shade hidden" id="shade">
+  <div class="menu">
+    <div class="preview" id="preview">消息操作</div>
+    <div class="actions" id="actions"></div>
+    <button class="cancel" id="cancelMenu">取消</button>
+  </div>
+</div>
+<div class="shade hidden" id="settingsShade">
+  <div class="settings-menu" id="settingsPanel"></div>
+</div>
+<div class="shade hidden" id="modalShade">
+  <div class="modal-box" id="modalBox"></div>
+</div>
+<div class="rp-overlay" id="rpOverlay"></div>
+<div class="lightbox" id="lightbox"><button class="close-lb" id="closeLb">×</button><img id="lbImg" src="" alt=""></div>
+<div class="toast hidden" id="toast"></div>
+</div>
+
+<script>
+document.addEventListener('gesturestart',function(e){e.preventDefault()},{passive:false});
+document.addEventListener('gesturechange',function(e){e.preventDefault()},{passive:false});
+document.addEventListener('gestureend',function(e){e.preventDefault()},{passive:false});
+let lastTouchEnd=0;
+document.addEventListener('touchend',function(e){
+  const now=Date.now();
+  if(now-lastTouchEnd<=300)e.preventDefault();
+  lastTouchEnd=now;
+},{passive:false});
+(()=>{
+const $=x=>document.getElementById(x);
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const numOr=(v,d)=>{const n=Number(v);return v===''||v==null||isNaN(n)?d:n};
+const chat=$('chat'),entry=$('entry');
+let msgs=[],seq=1,active=null,quoted=null,editing=null,typing=null,toastTimer;
+let profile={id:'chat_id_001',name:'对方',avatar:'',background:''};
+let chatSettings={minDelay:30,maxDelay:120,oppTransfer:true,oppRedpacket:true,transferProb:13,redpacketProb:13,cardMinCount:1,cardMaxCount:3,emojiMix:true,rejectProb:20};
+let stickerTab='stickers';
+let groups=[{id:'public',name:'公共（未分组）',enabled:true}];
+// 这里已经完全清空了默认字卡
+let cards=[];
+let cardSeq=20;
+const DEFAULT_CARDS=[];
+let filterType='all',filterGroup='all',searchQ='';
+let multiMode=false, multiSel=new Set();
+const defaultEmojis=['😀','🥹','😂','🥰','😭','🤍','✨','😎','🥺','🙃','😴','💗','🌷','🫶','😊','😉','😌','🤔','😶','🙄'];
+
+$('date').textContent=new Date().toLocaleDateString('zh-CN',{month:'long',day:'numeric'});
+
+/* ========== 本地持久化 ========== */
+// 修改了版本号，这样你手机浏览器里的旧数据会自动失效清零
+const STORE_KEY='baifog_chat_v2';
+let _saveTimer=null;
+function saveState(){
+  try{
+    localStorage.setItem(STORE_KEY,JSON.stringify({
+      version:6,profile,msgs,cards,groups,chatSettings,seq,cardSeq
+    }));
+  }catch(e){console.warn('保存失败',e)}
+}
+function scheduleSave(){clearTimeout(_saveTimer);_saveTimer=setTimeout(saveState,250)}
+function loadState(){
+  try{
+    const raw=localStorage.getItem(STORE_KEY);
+    if(!raw)return false;
+    const d=JSON.parse(raw);
+    if(d.profile)profile={...profile,...d.profile};
+    if(Array.isArray(d.groups)&&d.groups.length)groups=d.groups;
+    if(Array.isArray(d.cards))cards=d.cards; // 允许空数组
+    if(Array.isArray(d.msgs))msgs=d.msgs;
+    if(d.chatSettings)chatSettings={...chatSettings,...d.chatSettings};
+    seq=Math.max(1,...msgs.map(x=>Number(x.id)||0))+1;
+    cardSeq=Math.max(20,...cards.map(x=>Number(x.id)||0))+1;
+    return true;
+  }catch(e){console.warn('读取失败',e);return false}
+}
+
+function toast(s){
+  $('toast').textContent=s;$('toast').classList.remove('hidden');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.add('hidden'),1700);
+}
+function openLightbox(src){$('lbImg').src=src;$('lightbox').classList.add('show')}
+function closeLightbox(){$('lightbox').classList.remove('show');$('lbImg').src=''}
+function scroll(){requestAnimationFrame(()=>chat.scrollTop=chat.scrollHeight)}
+function find(id){return msgs.find(m=>m.id===id)}
+function nextId(){return ++cardSeq}
+function groupById(gid){return groups.find(g=>g.id===gid)}
+function groupName(gid){const g=groupById(gid);return g?g.name:'公共'}
+
+function render(m){
+  let r=document.createElement('div');r.className='row '+(m.mine?'mine':'');r.dataset.id=m.id;
+  function avatarStack(){
+    let w=document.createElement('div');w.className='avatar-stack';
+    let a=document.createElement('div');a.className='ava';
+    if(!m.mine&&profile.avatar){let im=document.createElement('img');im.src=profile.avatar;a.append(im)}
+    else if(m.mine){a.innerHTML='<svg viewBox="0 0 24 24" width="18" height="18" fill="#bbb"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>'}
+    else a.innerHTML='<svg viewBox="0 0 24 24" width="18" height="18" fill="#bbb"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
+    let t=document.createElement('span');t.className='avatar-time';
+    t.textContent=m.time||new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'});
+    w.append(a,t);return w;
+  }
+  if(!m.mine)r.append(avatarStack());
+  let b=document.createElement('div');
+  b.className='bubble'+(m.type==='image'||m.type==='sticker'?' sticker-bubble':'');
+  if(m.reply){
+    let q=document.createElement('div');q.className='quote';
+    q.innerHTML='<b>引用'+(m.reply.mine?'我的消息':'对方消息')+'</b>';
+    let s=document.createElement('span');s.textContent=m.reply.content;q.append(s);b.append(q);
+  }
+  if(m.type==='image'){let im=document.createElement('img');im.className='msgimg';im.src=m.content;im.style.cursor='pointer';im.onclick=e=>{e.stopPropagation();openLightbox(m.content)};b.append(im)}
+  else if(m.type==='sticker'){let im=document.createElement('img');im.className='sticker-img';im.src=m.content;im.style.cursor='pointer';im.onclick=e=>{e.stopPropagation();openLightbox(m.content)};b.append(im)}
+  else if(m.type==='emoji'){let st=document.createElement('div');st.className='sticker-emoji';st.textContent=m.content;b.append(st)}
+  else if(m.type==='transfer'||m.type==='redpacket'){
+    b.classList.add('pay-bubble');
+    const kind=m.type==='transfer'?'transfer':'redpacket';
+    const amount=(m.amount!=null?Number(m.amount):0).toFixed(2);
+    const status=m.status||'pending';
+    const opened=!!m.opened;
+    const card=document.createElement('div');
+    
+    let displayNote = m.note;
+    if(m.type === 'transfer' && (!displayNote || displayNote === '转账给你')) {
+        displayNote = m.mine ? ('转账给' + (profile.name || '你')) : '转账给你';
+    }
+
+    if(m.type==='redpacket'&&!opened&&status==='pending'){
+      card.className='pay-card redpacket closed';
+      const tip=m.mine?'等待对方领取':'点击拆开红包';
+      card.innerHTML=`<div class="pay-main"><div class="pay-seal">開</div><div class="pay-label">${esc(displayNote||'恭喜发财')}</div></div><div class="pay-foot">${tip}</div>`;
+      card.onclick=e=>{e.stopPropagation();openRedpacket(m)};
+    }else{
+      card.className='pay-card '+kind+(status!=='pending'?' done':'');
+      let foot='微信转账';
+      if(m.type==='redpacket')foot='微信红包';
+      if(status==='accepted')foot=m.mine?'对方已收款':'已收款';
+      else if(status==='rejected')foot=m.mine?'对方已退回':'已退回';
+      else if(status==='pending'&&m.mine)foot='待对方确认';
+      
+      const iconSvg=m.type==='transfer'
+        ?'<svg viewBox="0 0 24 24" style="stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><rect x="2" y="6" width="15" height="12" rx="2"/><path d="M6 10h7M6 14h4.5"/><path d="M17.5 8.5l4 3.5-4 3.5"/></svg>'
+        :'<svg viewBox="0 0 24 24" style="stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round"><rect x="5" y="3" width="14" height="18" rx="2.5"/><path d="M5 9.5h14" stroke-width="1.5"/><circle cx="12" cy="9.5" r="2.3" fill="currentColor" stroke="none"/></svg>';
+      
+      const title=esc(m.type==='transfer'?(displayNote):(opened||status!=='pending'||m.mine?('¥'+amount):(displayNote||'恭喜发财')));
+      const sub=m.type==='transfer'?('¥'+amount):(opened||status!=='pending'?('¥'+amount):'');
+      
+      card.innerHTML=`<div class="pay-main"><div class="pay-icon">${iconSvg}</div><div class="pay-info"><div class="pay-label">${title}</div>${sub?`<div class="pay-sub">${sub}</div>`:''}</div></div>
+        <div class="pay-foot">${foot}</div>
+        ${status==='pending'&&!m.mine&&m.type==='transfer'?`<div class="pay-actions"><button class="reject" data-act="reject">退还</button><button class="accept" data-act="accept">收款</button></div>`:''}
+        ${status==='pending'&&!m.mine&&m.type==='redpacket'&&opened?`<div class="pay-actions"><button class="reject" data-act="reject">退还</button><button class="accept" data-act="accept">收款</button></div>`:''}`;
+      
+      if(status==='pending'&&!m.mine){
+        card.querySelectorAll('[data-act]').forEach(btn=>{
+          btn.onclick=e=>{
+            e.stopPropagation();
+            const act=btn.dataset.act;
+            m.status=act==='accept'?'accepted':'rejected';
+            m.opened=true;
+            const oldEl=chat.querySelector('.row[data-id="'+m.id+'"]');
+            if(oldEl){
+              const ph=document.createElement('div');
+              oldEl.replaceWith(ph);
+              render(m);
+              const neu=chat.querySelector('.row[data-id="'+m.id+'"]');
+              if(neu&&ph.parentNode)ph.replaceWith(neu);
+            }else render(m);
+            scheduleSave();
+            toast(act==='accept'?'已收款':'已退回');
+          };
+        });
+      }
+    }
+    b.append(card);
+  }
+  else{let s=document.createElement('span');s.textContent=m.content;b.append(s)}
+  r.append(b);if(m.mine)r.append(avatarStack());
+  b.addEventListener('contextmenu',e=>{e.preventDefault();openMenu(m.id)});
+  let hold;b.addEventListener('touchstart',()=>hold=setTimeout(()=>openMenu(m.id),520),{passive:true});
+  ['touchend','touchmove','touchcancel'].forEach(e=>b.addEventListener(e,()=>clearTimeout(hold),{passive:true}));
+  b.addEventListener('dblclick',()=>openMenu(m.id));
+  chat.append(r);
+}
+function add(mine,content,type='text',reply=null){
+  let m={id:seq++,mine,content,type,reply,time:new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})};
+  msgs.push(m);render(m);scroll();scheduleSave();return m;
+}
+function openRedpacket(m){
+  const amount=(m.amount!=null?Number(m.amount):0).toFixed(2);
+  const ov=$('rpOverlay');
+  if(m.mine){
+    ov.innerHTML=`<div class="rp-open" style="position:relative">
+      <div class="rp-top">
+        <div class="rp-from">我发出的红包</div>
+        <div class="rp-amt"><span class="rp-yuan">¥</span>${amount}</div>
+      </div>
+      <div class="rp-note">${esc(m.note||'恭喜发财，大吉大利')}</div>
+      <div class="rp-btns"><button class="accept" id="rpAccept" style="width:100%">知道了</button></div>
+      <button class="rp-close" id="rpClose">×</button>
+    </div>`;
+    ov.classList.add('show');
+    const close=()=>{ov.classList.remove('show');m.opened=true;const oldEl=chat.querySelector('.row[data-id="'+m.id+'"]');if(oldEl){const ph=document.createElement('div');oldEl.replaceWith(ph);render(m);const neu=chat.querySelector('.row[data-id="'+m.id+'"]');if(neu&&ph.parentNode)ph.replaceWith(neu)}else render(m);scheduleSave()};
+    $('rpClose').onclick=close;
+    $('rpAccept').onclick=close;
+    ov.onclick=e=>{if(e.target===ov)close()};
+  }else{
+    ov.innerHTML=`<div class="rp-open" style="position:relative">
+      <div class="rp-top">
+        <div class="rp-from">对方的红包</div>
+        <div class="rp-amt"><span class="rp-yuan">¥</span>${amount}</div>
+      </div>
+      <div class="rp-note">${esc(m.note||'恭喜发财，大吉大利')}</div>
+      <div class="rp-btns">
+        <button class="reject" id="rpReject">退回</button>
+        <button class="accept" id="rpAccept">收款</button>
+      </div>
+      <button class="rp-close" id="rpClose">×</button>
+    </div>`;
+    ov.classList.add('show');
+    const close=()=>ov.classList.remove('show');
+    $('rpClose').onclick=close;
+    ov.onclick=e=>{if(e.target===ov)close()};
+    $('rpAccept').onclick=()=>{
+      m.status='accepted';m.opened=true;close();
+      const oldEl=chat.querySelector('.row[data-id="'+m.id+'"]');
+      if(oldEl){const ph=document.createElement('div');oldEl.replaceWith(ph);render(m);const neu=chat.querySelector('.row[data-id="'+m.id+'"]');if(neu&&ph.parentNode)ph.replaceWith(neu)}else render(m);
+      scheduleSave();toast('已收款');
+    };
+    $('rpReject').onclick=()=>{
+      m.status='rejected';m.opened=true;close();
+      const oldEl=chat.querySelector('.row[data-id="'+m.id+'"]');
+      if(oldEl){const ph=document.createElement('div');oldEl.replaceWith(ph);render(m);const neu=chat.querySelector('.row[data-id="'+m.id+'"]');if(neu&&ph.parentNode)ph.replaceWith(neu)}else render(m);
+      scheduleSave();toast('已退回');
+    };
+  }
+}
+function addPay(mine,type,amount,note){
+  let m={id:seq++,mine,content:note||'',type,amount:Number(amount),note:note||'',status:'pending',time:new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})};
+  msgs.push(m);render(m);scroll();scheduleSave();return m;
+}
+function showTyping(){
+  hideTyping();typing=document.createElement('div');typing.className='row';
+  const avHtml=profile.avatar?('<img src="'+profile.avatar+'" alt="">'):'<svg viewBox="0 0 24 24" width="18" height="18" fill="#bbb"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>';
+  typing.innerHTML='<div class="ava">'+avHtml+'</div><div class="bubble typing-bubble"><span class="dotting"></span><span class="dotting"></span><span class="dotting"></span></div>';
+  chat.append(typing);scroll();
+}
+function hideTyping(){if(typing){typing.remove();typing=null}}
+let _autoTimer=null;
+function auto(){
+  if(_autoTimer){clearTimeout(_autoTimer);_autoTimer=null}
+  const enabledGroups=new Set(groups.filter(g=>g.enabled!==false).map(g=>g.id));
+  let pool=cards.filter(c=>c.enabled!==false&&enabledGroups.has(c.group||'public'));
+  if(chatSettings.emojiMix===false) pool=pool.filter(c=>c.type==='text');
+  if(!pool.length&&chatSettings.oppTransfer===false&&chatSettings.oppRedpacket===false)return;
+  showTyping();
+  const min=Math.max(1,Number(chatSettings.minDelay)||30);
+  const max=Math.max(min,Number(chatSettings.maxDelay)||120);
+  const delay=(min+Math.random()*(max-min))*1000;
+  _autoTimer=setTimeout(()=>{
+    _autoTimer=null;
+    hideTyping();
+    const r=Math.random()*100;
+    const tp=numOr(chatSettings.transferProb,13);
+    const rp=numOr(chatSettings.redpacketProb,13);
+    if(chatSettings.oppTransfer!==false&&r<tp){
+      const amt=(Math.random()*50+0.01).toFixed(2);
+      addPay(false,'transfer',amt,'转账给你');
+      return;
+    }
+    if(chatSettings.oppRedpacket!==false&&r<tp+rp){
+      const amt=(Math.random()*20+0.01).toFixed(2);
+      addPay(false,'redpacket',amt,'恭喜发财');
+      return;
+    }
+    if(!pool.length)return;
+    const cMin=Math.max(1,Math.min(10,parseInt(chatSettings.cardMinCount)||1));
+    const cMax=Math.max(cMin,Math.min(10,parseInt(chatSettings.cardMaxCount)||3));
+    const count=cMin+Math.floor(Math.random()*(cMax-cMin+1));
+    let bag=pool.slice();
+    const picks=[];
+    for(let i=0;i<count&&bag.length;i++){
+      const idx=Math.floor(Math.random()*bag.length);
+      picks.push(bag[idx]);
+      bag.splice(idx,1);
+    }
+    function sendOne(i){
+      if(i>=picks.length)return;
+      const c=picks[i];
+      if(c.type==='image')add(false,c.content,'sticker');
+      else if(c.type==='emoji')add(false,c.content,'emoji');
+      else add(false,c.content,'text');
+      if(i+1<picks.length){
+        showTyping();
+        const gap=600+Math.random()*900;
+        setTimeout(()=>{hideTyping();sendOne(i+1)},gap);
+      }
+    }
+    sendOne(0);
+  },delay);
+}
+function clearQuote(){quoted=null;$('reply').classList.remove('show')}
+function quote(m){
+  quoted={mine:m.mine,content:m.type==='image'||m.type==='sticker'?'[图片/表情包]':m.content};
+  editing=null;entry.value='';
+  $('replyTitle').textContent=m.mine?'引用我的消息':'引用对方消息';
+  $('replyText').textContent=quoted.content;$('reply').classList.add('show');entry.focus();
+}
+function resize(){entry.style.height='auto';entry.style.height=Math.min(entry.scrollHeight,100)+'px'}
+function send(){
+  let v=entry.value.trim();if(!v)return;
+  if(editing){
+    let m=find(editing);
+    if(m){
+      m.content=v;
+      const old=chat.querySelector('.row[data-id="'+m.id+'"]');
+      if(old){
+        const placeholder=document.createElement('div');
+        old.replaceWith(placeholder);
+        render(m);
+        const neu=chat.querySelector('.row[data-id="'+m.id+'"]');
+        if(neu&&placeholder.parentNode){
+          placeholder.replaceWith(neu);
+        }
+      }else{
+        render(m);
+      }
+      scheduleSave();
+    }
+    editing=null;entry.value='';clearQuote();resize();toast('消息已修改');return;
+  }
+  add(true,v,'text',quoted?{...quoted}:null);entry.value='';clearQuote();resize();auto();
+}
+function openMenu(id){
+  let m=find(id);if(!m)return;active=id;
+  $('preview').textContent=(m.mine?'我：':'对方：')+(m.type==='image'||m.type==='sticker'?'[图片/表情包]':m.type==='transfer'?'[转账]':m.type==='redpacket'?'[红包]':m.content);
+  let list=m.mine?[['↶','引用','quote'],['▢','复制','copy'],['✎','修改','edit'],['⌫','删除','delete']]:[['↶','引用','quote'],['▢','复制','copy'],['⌫','删除','delete']];
+  if(m.type==='image'||m.type==='sticker'||m.type==='emoji')list=list.filter(x=>x[2]!=='edit');
+  $('actions').innerHTML='';
+  list.forEach(([ico,label,act])=>{
+    let b=document.createElement('button');if(act==='delete')b.className='danger';
+    b.innerHTML='<strong>'+ico+'</strong>'+label;b.onclick=()=>action(act);$('actions').append(b);
+  });
+  $('shade').classList.remove('hidden');
+}
+function closeMenu(){$('shade').classList.add('hidden');active=null}
+async function action(act){
+  let m=find(active);if(!m)return closeMenu();
+  if(act==='quote'){quote(m);closeMenu()}
+  else if(act==='copy'){
+    try{await navigator.clipboard.writeText(m.type==='image'||m.type==='sticker'?'[图片/表情包]':m.content);toast('已复制')}
+    catch{toast('当前浏览器不允许复制')}
+    closeMenu();
+  }else if(act==='edit'){
+    editing=m.id;entry.value=m.content;
+    $('replyTitle').textContent='修改消息';$('replyText').textContent='保存后更新原消息';
+    $('reply').classList.add('show');quoted=null;resize();entry.focus();closeMenu();
+  }else if(act==='delete'){
+    closeMenu();
+    const mid=m.id;
+    const box=$('modalBox');
+    box.innerHTML=`<h3>删除消息</h3><p style="font-size:14px;color:#555;margin:8px 0 16px">确定删除这条消息吗？</p><div class="modal-actions"><button id="modalCancel">取消</button><button class="danger" id="modalOk">删除</button></div>`;
+    $('modalShade').classList.remove('hidden');
+    $('modalCancel').onclick=()=>$('modalShade').classList.add('hidden');
+    $('modalOk').onclick=()=>{
+      msgs=msgs.filter(x=>x.id!==mid);
+      chat.querySelector('.row[data-id="'+mid+'"]')?.remove();
+      $('modalShade').classList.add('hidden');
+      scheduleSave();
+      toast('消息已删除');
+    };
+  }
+}
+$('send').addEventListener('click',e=>{e.preventDefault();send()});
+entry.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send()}});
+entry.addEventListener('input',resize);
+$('cancelReply').onclick=()=>{clearQuote();editing=null};
+
+function renderStickerPanel(){
+  const box=$('stickerContent');box.innerHTML='';
+  const imgs=cards.filter(c=>c.type==='image');
+  const grid=document.createElement('div');grid.className='sticker-grid';
+  imgs.forEach(c=>{
+    const item=document.createElement('div');item.className='sticker-item';
+    item.innerHTML=`<img src="${esc(c.content)}" alt=""><button class="sticker-del" title="删除">×</button>`;
+    item.querySelector('img').onclick=()=>{
+      if(c.enabled===false){toast('该表情包已禁用');return}
+      add(true,c.content,'sticker',quoted?{...quoted}:null);clearQuote();closeStickerPanel();auto();
+    };
+    item.querySelector('.sticker-del').onclick=e=>{
+      e.stopPropagation();
+      const boxm=$('modalBox');
+      boxm.innerHTML=`<h3>删除表情包</h3><p style="font-size:14px;color:#555;margin:8px 0 16px">确定删除这个表情包吗？</p><div class="modal-actions"><button id="modalCancel">取消</button><button class="danger" id="modalOk">删除</button></div>`;
+      $('modalShade').classList.remove('hidden');
+      $('modalCancel').onclick=()=>$('modalShade').classList.add('hidden');
+      $('modalOk').onclick=()=>{
+        cards=cards.filter(x=>x.id!==c.id);
+        $('modalShade').classList.add('hidden');
+        renderStickerPanel();scheduleSave();
+        toast('已删除');
+      };
+    };
+    grid.append(item);
+  });
+  const addBtn=document.createElement('div');addBtn.className='sticker-item sticker-add';addBtn.textContent='＋';
+  addBtn.onclick=()=>$('stickerFile').click();
+  grid.append(addBtn);box.append(grid);
+}
+function openStickerPanel(){$('stickerPanel').classList.add('show');renderStickerPanel()}
+function closeStickerPanel(){$('stickerPanel').classList.remove('show')}
+$('emoji').onclick=()=>{if($('stickerPanel').classList.contains('show'))closeStickerPanel();else openStickerPanel()};
+$('closeSticker').onclick=closeStickerPanel;
+$('stickerFile').onchange=e=>{
+  [...e.target.files].forEach(f=>{
+    if(!f.type.startsWith('image/'))return;
+    const rd=new FileReader();
+    rd.onload=()=>{cards.push({id:nextId(),type:'image',content:rd.result,group:'public',enabled:true});if($('cardsPage').classList.contains('show'))renderCardsPage();else renderStickerPanel();scheduleSave();toast('表情包已添加')};
+    rd.readAsDataURL(f);
+  });
+  e.target.value='';
+};
+$('image').onclick=()=>$('file').click();
+$('file').onchange=e=>{
+  [...e.target.files].forEach(f=>{
+    if(!f.type.startsWith('image/'))return;
+    let rd=new FileReader();
+    rd.onload=()=>{add(true,rd.result,'image',quoted?{...quoted}:null);clearQuote();auto()};
+    rd.readAsDataURL(f);
+  });
+  e.target.value='';
+};
+$('cancelMenu').onclick=closeMenu;
+$('shade').onclick=e=>{if(e.target===$('shade'))closeMenu()};
+$('back').onclick=()=>toast('独立聊天页面原型');
+$('closeLb').onclick=closeLightbox;
+$('lightbox').onclick=e=>{if(e.target===$('lightbox')||e.target===$('closeLb'))closeLightbox()};
+
+function filteredCards(){
+  return cards.filter(c=>{
+    if(filterType!=='all'&&c.type!==filterType)return false;
+    if(filterGroup!=='all'&&(c.group||'public')!==filterGroup)return false;
+    if(searchQ){
+      const q=searchQ.toLowerCase();
+      if(c.type==='image')return false;
+      if(!(c.content||'').toLowerCase().includes(q))return false;
+    }
+    return true;
+  });
+}
+function renderCardsPage(){
+  $('cardsCount').textContent=cards.length;
+  const gf=$('groupFilter');gf.innerHTML='';
+  const allBtn=document.createElement('button');
+  allBtn.className='gchip'+(filterGroup==='all'?' active':'');
+  allBtn.innerHTML=`全部分组 <span class="cnt">${cards.length}</span>`;
+  allBtn.onclick=()=>{filterGroup='all';renderCardsPage()};
+  gf.append(allBtn);
+  groups.forEach(g=>{
+    const cnt=cards.filter(c=>(c.group||'public')===g.id).length;
+    const b=document.createElement('button');
+    b.className='gchip'+(filterGroup===g.id?' active':'')+(g.enabled===false?' disabled-group':'');
+    b.innerHTML=`${esc(g.name)} <span class="cnt">${cnt}</span>`;
+    b.onclick=()=>{filterGroup=g.id;renderCardsPage()};
+    gf.append(b);
+  });
+  const list=$('cardList');list.innerHTML='';
+  const items=filteredCards();
+  if(!items.length){list.innerHTML='<div class="empty-tip">暂无字卡</div>'}
+  else{
+    items.forEach(c=>{
+      const item=document.createElement('div');item.className='card-item'+(multiMode?' multi':'');
+      let iconHtml=c.type==='image'?`<img src="${esc(c.content)}" alt="">`:c.type==='emoji'?esc(c.content):'Aa';
+      const checkHtml=multiMode?`<div class="card-check${multiSel.has(String(c.id))?' on':''}">${multiSel.has(String(c.id))?'✓':''}</div>`:'';
+      item.innerHTML=`${checkHtml}<div class="card-icon">${iconHtml}</div><div class="card-main"><div class="title">${c.type==='image'?'[表情包]':esc(c.content)}</div><div class="meta">${esc(groupName(c.group))} · ${c.type==='text'?'文字':c.type==='emoji'?'Emoji':'表情包'} · ${c.enabled!==false?'已启用':'已禁用'}</div></div><div class="card-tools">${multiMode?'':`<div class="sw${c.enabled!==false?' on':''}" data-id="${esc(c.id)}"></div><button class="tool-btn edit" data-id="${esc(c.id)}">✎</button><button class="tool-btn del" data-id="${esc(c.id)}">⌫</button>`}</div>`;
+      if(multiMode){
+        item.onclick=()=>{const id=String(c.id);if(multiSel.has(id))multiSel.delete(id);else multiSel.add(id);renderCardsPage();updateMultiBar()};
+      }else{
+        item.querySelector('.sw')?.addEventListener('click',e=>{e.stopPropagation();c.enabled=c.enabled===false?true:false;renderCardsPage()});
+        item.querySelector('.edit')?.addEventListener('click',e=>{e.stopPropagation();openEditCard(c)});
+        item.querySelector('.del')?.addEventListener('click',e=>{
+          e.stopPropagation();
+          const box=$('modalBox');
+          box.innerHTML=`<h3>确认删除</h3><p style="font-size:14px;color:#555;margin:8px 0 16px">确定删除这张字卡吗？</p><div class="modal-actions"><button id="modalCancel">取消</button><button class="danger" id="modalOk">删除</button></div>`;
+          $('modalShade').classList.remove('hidden');
+          $('modalCancel').onclick=()=>$('modalShade').classList.add('hidden');
+          $('modalOk').onclick=()=>{
+            cards=cards.filter(x=>x.id!==c.id);
+            $('modalShade').classList.add('hidden');
+            renderCardsPage();scheduleSave();toast('已删除');
+          };
+        });
+      }
+      list.append(item);
+    });
+  }
+  $('multiToggle').textContent=multiMode?'完成':'选择';
+  $('multiBar').classList.toggle('show',multiMode);
+  updateMultiBar();
+  scheduleSave();
+}
+function updateMultiBar(){$('selCount').textContent='已选 '+multiSel.size}
+function openCardsPage(){
+  multiMode=false;multiSel.clear();filterType='all';filterGroup='all';searchQ='';
+  $('cardSearch').value='';
+  document.querySelectorAll('#typeFilter .chip').forEach(c=>c.classList.toggle('active',c.dataset.type==='all'));
+  $('cardsPage').classList.add('show');renderCardsPage();
+}
+function closeCardsPage(){$('cardsPage').classList.remove('show');multiMode=false;multiSel.clear()}
+$('cardsBack').onclick=closeCardsPage;
+$('multiToggle').onclick=()=>{multiMode=!multiMode;multiSel.clear();renderCardsPage()};
+$('multiCancel').onclick=()=>{multiMode=false;multiSel.clear();renderCardsPage()};
+$('multiDel').onclick=()=>{
+  if(!multiSel.size)return toast('请先选择字卡');
+  const n=multiSel.size;
+  const box=$('modalBox');
+  box.innerHTML=`<h3>确认删除</h3><p style="font-size:14px;color:#555;margin:8px 0 16px">确定删除选中的 ${n} 张字卡吗？此操作不可撤销。</p><div class="modal-actions"><button id="modalCancel">取消</button><button class="danger" id="modalOk">删除</button></div>`;
+  $('modalShade').classList.remove('hidden');
+  $('modalCancel').onclick=()=>$('modalShade').classList.add('hidden');
+  $('modalOk').onclick=()=>{
+    cards=cards.filter(c=>!multiSel.has(String(c.id)));
+    multiSel.clear();multiMode=false;
+    $('modalShade').classList.add('hidden');
+    renderCardsPage();scheduleSave();toast('已删除 '+n+' 张');
+  };
+};
+$('multiMove').onclick=()=>{if(!multiSel.size)return toast('请先选择字卡');openMoveGroupModal([...multiSel])};
+$('cardSearch').oninput=e=>{searchQ=e.target.value.trim();renderCardsPage()};
+document.querySelectorAll('#typeFilter .chip').forEach(chip=>{
+  chip.onclick=()=>{document.querySelectorAll('#typeFilter .chip').forEach(c=>c.classList.remove('active'));chip.classList.add('active');filterType=chip.dataset.type;renderCardsPage()};
+});
+function openAddTextModal(){
+  const box=$('modalBox');
+  box.innerHTML=`<h3>添加文字字卡</h3><p style="font-size:12px;color:#888;margin:0 0 8px">每行一张，可一次粘贴多行</p><textarea class="field" id="multiText" placeholder="第一行字卡&#10;第二行字卡&#10;第三行字卡"></textarea><label class="setting-label">加入分组</label><select class="field" id="addGroupSel"></select><div class="modal-actions"><button id="modalCancel">取消</button><button class="primary" id="modalOk">添加</button></div>`;
+  const sel=$('addGroupSel');groups.forEach(g=>{const o=document.createElement('option');o.value=g.id;o.textContent=g.name;sel.append(o)});
+  $('modalShade').classList.remove('hidden');
+  $('modalCancel').onclick=()=>$('modalShade').classList.add('hidden');
+  $('modalOk').onclick=()=>{
+    const lines=$('multiText').value.split(/\n/).map(s=>s.trim()).filter(Boolean);
+    if(!lines.length)return toast('请输入内容');
+    const gid=sel.value||'public';
+    lines.forEach(t=>cards.push({id:nextId(),type:'text',content:t,group:gid,enabled:true}));
+    $('modalShade').classList.add('hidden');renderCardsPage();toast(`已添加 ${lines.length} 张字卡`);
+  };
+}
+function openEditCard(c){
+  if(c.type==='image'){toast('表情包暂不支持改内容');return}
+  const box=$('modalBox');
+  box.innerHTML=`<h3>编辑字卡</h3><textarea class="field" id="editContent">${esc(c.content)}</textarea><label class="setting-label">分组</label><select class="field" id="editGroupSel"></select><div class="modal-actions"><button id="modalCancel">取消</button><button class="primary" id="modalOk">保存</button></div>`;
+  const sel=$('editGroupSel');groups.forEach(g=>{const o=document.createElement('option');o.value=g.id;o.textContent=g.name;if(g.id===(c.group||'public'))o.selected=true;sel.append(o)});
+  $('modalShade').classList.remove('hidden');
+  $('modalCancel').onclick=()=>$('modalShade').classList.add('hidden');
+  $('modalOk').onclick=()=>{
+    const v=$('editContent').value.trim();if(!v)return toast('内容不能为空');
+    c.content=v;c.group=sel.value||'public';$('modalShade').classList.add('hidden');renderCardsPage();toast('已保存');
+  };
+}
+function openMoveGroupModal(ids){
+  const box=$('modalBox');
+  box.innerHTML=`<h3>移到分组（${ids.length} 张）</h3><div id="moveGroupList" style="max-height:240px;overflow:auto"></div><div class="modal-actions"><button id="modalCancel">取消</button></div>`;
+  const list=$('moveGroupList');
+  groups.forEach(g=>{
+    const b=document.createElement('button');b.className='setting-row';b.style.borderBottom='1px solid #f0f0f0';
+    b.textContent=g.name+(g.enabled===false?'（已禁用）':'');
+    b.onclick=()=>{const idSet=new Set(ids.map(String));cards.forEach(c=>{if(idSet.has(String(c.id)))c.group=g.id});multiSel.clear();multiMode=false;$('modalShade').classList.add('hidden');renderCardsPage();scheduleSave();toast('已移动')};
+    list.append(b);
+  });
+  $('modalShade').classList.remove('hidden');
+  $('modalCancel').onclick=()=>$('modalShade').classList.add('hidden');
+}
+function openAddGroupModal(){
+  const box=$('modalBox');
+  box.innerHTML=`<h3>新建分组</h3><input class="field" id="newGroupName" placeholder="分组名称" maxlength="20"><div class="modal-actions"><button id="modalCancel">取消</button><button class="primary" id="modalOk">创建</button></div>`;
+  $('modalShade').classList.remove('hidden');
+  $('modalCancel').onclick=()=>$('modalShade').classList.add('hidden');
+  $('modalOk').onclick=()=>{
+    const name=$('newGroupName').value.trim();if(!name)return toast('请输入名称');
+    if(groups.some(g=>g.name===name))return toast('名称已存在');
+    groups.push({id:'g_'+Date.now(),name,enabled:true});
+    $('modalShade').classList.add('hidden');renderCardsPage();scheduleSave();toast('分组已创建');
+  };
+}
+function openManageGroups(){
+  const box=$('modalBox');
+  box.innerHTML=`<h3>分组管理</h3><div id="groupManageList"></div><div class="modal-actions"><button id="modalCancel">关闭</button></div>`;
+  const list=$('groupManageList');
+  groups.forEach(g=>{
+    if(g.id==='public'){
+      const row=document.createElement('div');row.className='setting-row';
+      row.innerHTML=`<span style="flex:1">${esc(g.name)}</span><span style="font-size:12px;color:#999">系统</span>`;list.append(row);return;
+    }
+    const row=document.createElement('div');row.className='setting-row';row.style.flexWrap='wrap';
+    row.innerHTML=`<span style="flex:1">${esc(g.name)}</span><div class="sw${g.enabled!==false?' on':''}" data-gid="${esc(g.id)}"></div><button class="tool-btn ren" data-gid="${esc(g.id)}">✎</button><button class="tool-btn del" data-gid="${esc(g.id)}" style="color:#d44">⌫</button>`;
+    row.querySelector('.sw').onclick=()=>{g.enabled=g.enabled===false?true:false;openManageGroups();scheduleSave();toast(g.enabled?'分组已启用':'分组已禁用')};
+    row.querySelector('.ren').onclick=()=>{const n=prompt('重命名分组',g.name);if(n&&n.trim()){g.name=n.trim();openManageGroups();renderCardsPage();scheduleSave()}};
+    row.querySelector('.del').onclick=()=>{
+      if(!confirm(`删除分组「${g.name}」？其中的字卡将移到公共。`))return;
+      cards.forEach(c=>{if(c.group===g.id)c.group='public'});groups=groups.filter(x=>x.id!==g.id);
+      if(filterGroup===g.id)filterGroup='all';openManageGroups();renderCardsPage();scheduleSave();toast('分组已删除');
+    };
+    list.append(row);
+  });
+  $('modalShade').classList.remove('hidden');
+  $('modalCancel').onclick=()=>$('modalShade').classList.add('hidden');
+}
+$('addCardBtn').onclick=()=>{
+  const box=$('modalBox');
+  box.innerHTML=`<h3>添加字卡</h3><button class="setting-row" id="pickText"><span class="symbol">Aa</span><span>文字字卡<small>支持多行一次添加</small></span></button><button class="setting-row" id="pickImg"><span class="symbol">▣</span><span>表情包<small>从相册选择图片</small></span></button><button class="setting-row" id="pickEmoji"><span class="symbol">☺</span><span>Emoji<small>添加常用表情</small></span></button><div class="modal-actions"><button id="modalCancel">取消</button></div>`;
+  $('modalShade').classList.remove('hidden');
+  $('modalCancel').onclick=()=>$('modalShade').classList.add('hidden');
+  $('pickText').onclick=()=>{$('modalShade').classList.add('hidden');openAddTextModal()};
+  $('pickImg').onclick=()=>{$('modalShade').classList.add('hidden');$('stickerFile').click()};
+  $('pickEmoji').onclick=()=>{
+    $('modalShade').classList.add('hidden');
+    const box2=$('modalBox');
+    box2.innerHTML=`<h3>选择 Emoji</h3><div class="emoji-row" id="emojiPick"></div><div class="modal-actions"><button id="modalCancel">关闭</button></div>`;
+    defaultEmojis.forEach(e=>{const b=document.createElement('button');b.textContent=e;b.onclick=()=>{cards.push({id:nextId(),type:'emoji',content:e,group:'public',enabled:true});renderCardsPage();toast('已添加 '+e)};$('emojiPick').append(b)});
+    $('modalShade').classList.remove('hidden');$('modalCancel').onclick=()=>$('modalShade').classList.add('hidden');
+  };
+};
+$('addTextBtn').onclick=openAddTextModal;
+$('addGroupBtn').onclick=openAddGroupModal;
+$('manageGroupBtn').onclick=openManageGroups;
+$('modalShade').onclick=e=>{if(e.target===$('modalShade'))$('modalShade').classList.add('hidden')};
+
+function openSendPay(type){
+  const isT=type==='transfer';
+  const defaultNote = isT ? ('转账给' + (profile.name || '你')) : '恭喜发财';
+  const box=$('modalBox');
+  box.innerHTML=`<h3>${isT?'发转账':'发红包'}</h3>
+    <label class="setting-label">金额（元）</label>
+    <input class="field" id="payAmount" type="number" step="0.01" min="0.01" placeholder="0.00" inputmode="decimal">
+    <label class="setting-label">备注</label>
+    <input class="field" id="payNote" maxlength="30" placeholder="${defaultNote}">
+    <div class="modal-actions">
+      <button id="modalCancel">取消</button>
+      <button class="primary" id="modalOk">发送</button>
+    </div>`;
+  $('modalShade').classList.remove('hidden');
+  $('modalCancel').onclick=()=>$('modalShade').classList.add('hidden');
+  $('modalOk').onclick=()=>{
+    const amt=parseFloat($('payAmount').value);
+    if(!amt||amt<=0)return toast('请输入有效金额');
+    const note=$('payNote').value.trim()||defaultNote;
+    const sent=addPay(true,type,amt.toFixed(2),note);
+    $('modalShade').classList.add('hidden');
+    const mid=sent.id;
+    setTimeout(()=>{
+      const m=find(mid);
+      if(m&&m.status==='pending'&&m.mine){
+        const rej=numOr(chatSettings.rejectProb,20);
+        m.status=(Math.random()*100<rej)?'rejected':'accepted';
+        if(m.type==='redpacket')m.opened=true;
+        const oldEl=chat.querySelector('.row[data-id="'+m.id+'"]');
+        if(oldEl){
+          const ph=document.createElement('div');
+          oldEl.replaceWith(ph);
+          render(m);
+          const neu=chat.querySelector('.row[data-id="'+m.id+'"]');
+          if(neu&&ph.parentNode)ph.replaceWith(neu);
+        }else render(m);
+        scheduleSave();
+      }
+    },1500+Math.random()*2500);
+    auto();
+  };
+}
+function openSettings(){
+  const panel=$('settingsPanel');
+  panel.innerHTML=`<div class="settings-head">聊天设置</div>
+    <label class="setting-label">对方回复速度（秒）</label>
+    <div style="display:flex;align-items:center;gap:8px;margin:6px 0 12px;flex-wrap:wrap">
+      <span style="font-size:13px;color:#666">最快</span>
+      <button class="panel-button" id="editMinDelay" style="min-width:56px">${chatSettings.minDelay}</button>
+      <span style="font-size:13px;color:#666">～</span>
+      <button class="panel-button" id="editMaxDelay" style="min-width:56px">${chatSettings.maxDelay}</button>
+      <span style="font-size:13px;color:#666">最慢</span>
+    </div>
+    <div class="setting-row" style="justify-content:space-between">
+      <span><b>字卡 + Emoji 混合发送</b><small>回复时从字卡库混合抽取文字/表情包/Emoji</small></span>
+      <div class="sw${chatSettings.emojiMix!==false?' on':''}" id="swEmojiMix"></div>
+    </div>
+    <label class="setting-label">对方每次回复字卡数量（最少 / 最多）</label>
+    <div style="display:flex;align-items:center;gap:8px;margin:6px 0 12px">
+      <button class="panel-button" id="editCardMin" style="min-width:56px">${chatSettings.cardMinCount??1}</button>
+      <span style="font-size:13px;color:#666">～</span>
+      <button class="panel-button" id="editCardMax" style="min-width:56px">${chatSettings.cardMaxCount??3}</button>
+    </div>
+    <div class="settings-head">对方转账 / 红包</div>
+    <div class="setting-row" style="justify-content:space-between">
+      <span>允许对方发转账</span>
+      <div class="sw${chatSettings.oppTransfer!==false?' on':''}" id="swTransfer"></div>
+    </div>
+    <div class="setting-row" style="justify-content:space-between">
+      <span>允许对方发红包</span>
+      <div class="sw${chatSettings.oppRedpacket!==false?' on':''}" id="swRedpacket"></div>
+    </div>
+    <label class="setting-label">对方发转账概率 %</label>
+    <button class="panel-button" id="editTransferProb" style="min-width:56px">${chatSettings.transferProb}</button>
+    <label class="setting-label">对方发红包概率 %</label>
+    <button class="panel-button" id="editRedpacketProb" style="min-width:56px">${chatSettings.redpacketProb}</button>
+    <label class="setting-label">对方拒收/退回我方转账红包概率 %</label>
+    <button class="panel-button" id="editRejectProb" style="min-width:56px">${chatSettings.rejectProb}</button>
+    <div style="text-align:right;padding-top:12px">
+      <button class="panel-button" id="closeSettings">关闭</button>
+    </div>`;
+  $('settingsShade').classList.remove('hidden');
+  $('closeSettings').onclick=()=>$('settingsShade').classList.add('hidden');
+  function editDelay(which){
+    const isMin=which==='min';
+    const cur=isMin?chatSettings.minDelay:chatSettings.maxDelay;
+    const box=$('modalBox');
+    box.innerHTML=`<h3>${isMin?'最快回复秒数':'最慢回复秒数'}</h3>
+      <input class="field" id="delayInput" type="number" inputmode="numeric" min="1" step="1" value="${cur}">
+      <div class="modal-actions"><button id="modalCancel">取消</button><button class="primary" id="modalOk">确定</button></div>`;
+    $('modalShade').classList.remove('hidden');
+    setTimeout(()=>{$('delayInput').focus();$('delayInput').select()},50);
+    $('modalCancel').onclick=()=>$('modalShade').classList.add('hidden');
+    $('modalOk').onclick=()=>{
+      const n=parseInt($('delayInput').value,10);
+      if(!n||n<1){toast('请输入有效秒数');return}
+      if(isMin){
+        chatSettings.minDelay=n;
+        if(chatSettings.maxDelay<n)chatSettings.maxDelay=n;
+      }else{
+        chatSettings.maxDelay=n;
+        if(chatSettings.minDelay>n)chatSettings.minDelay=n;
+      }
+      $('editMinDelay').textContent=chatSettings.minDelay;
+      $('editMaxDelay').textContent=chatSettings.maxDelay;
+      $('modalShade').classList.add('hidden');
+      scheduleSave();
+      toast('已更新 '+chatSettings.minDelay+'～'+chatSettings.maxDelay+' 秒');
+    };
+  }
+  $('editMinDelay').onclick=()=>editDelay('min');
+  $('editMaxDelay').onclick=()=>editDelay('max');
+  $('swTransfer').onclick=()=>{
+    chatSettings.oppTransfer=chatSettings.oppTransfer===false?true:false;
+    $('swTransfer').classList.toggle('on',chatSettings.oppTransfer!==false);
+    scheduleSave();
+    toast(chatSettings.oppTransfer!==false?'已允许对方转账':'已关闭对方转账');
+  };
+  $('swRedpacket').onclick=()=>{
+    chatSettings.oppRedpacket=chatSettings.oppRedpacket===false?true:false;
+    $('swRedpacket').classList.toggle('on',chatSettings.oppRedpacket!==false);
+    scheduleSave();
+    toast(chatSettings.oppRedpacket!==false?'已允许对方红包':'已关闭对方红包');
+  };
+  $('swEmojiMix').onclick=()=>{
+    chatSettings.emojiMix=chatSettings.emojiMix===false?true:false;
+    $('swEmojiMix').classList.toggle('on',chatSettings.emojiMix!==false);
+    scheduleSave();
+    toast(chatSettings.emojiMix!==false?'已开启混合发送':'已关闭混合发送');
+  };
+  function editCardCount(which){
+    const isMin=which==='min';
+    const key=isMin?'cardMinCount':'cardMaxCount';
+    const cur=chatSettings[key]??(isMin?1:3);
+    const box=$('modalBox');
+    box.innerHTML=`<h3>${isMin?'最少字卡数':'最多字卡数'}（1-10）</h3>
+      <input class="field" id="cntInput" type="number" inputmode="numeric" min="1" max="10" step="1" value="${cur}">
+      <div class="modal-actions"><button id="modalCancel">取消</button><button class="primary" id="modalOk">确定</button></div>`;
+    $('modalShade').classList.remove('hidden');
+    setTimeout(()=>{$('cntInput').focus();$('cntInput').select()},50);
+    $('modalCancel').onclick=()=>$('modalShade').classList.add('hidden');
+    $('modalOk').onclick=()=>{
+      let n=parseInt($('cntInput').value,10);
+      if(isNaN(n)||n<1)n=1;if(n>10)n=10;
+      chatSettings[key]=n;
+      if(chatSettings.cardMinCount>chatSettings.cardMaxCount){
+        if(isMin)chatSettings.cardMaxCount=n;else chatSettings.cardMinCount=n;
+      }
+      $('editCardMin').textContent=chatSettings.cardMinCount;
+      $('editCardMax').textContent=chatSettings.cardMaxCount;
+      $('modalShade').classList.add('hidden');
+      scheduleSave();
+      toast('每次回复 '+chatSettings.cardMinCount+'～'+chatSettings.cardMaxCount+' 张字卡');
+    };
+  }
+  $('editCardMin').onclick=()=>editCardCount('min');
+  $('editCardMax').onclick=()=>editCardCount('max');
+  function editProb(key,label,btnId){
+    const box=$('modalBox');
+    box.innerHTML=`<h3>${label}</h3>
+      <input class="field" id="probInput" type="number" inputmode="numeric" min="0" max="100" step="1" value="${chatSettings[key]}">
+      <div class="modal-actions"><button id="modalCancel">取消</button><button class="primary" id="modalOk">确定</button></div>`;
+    $('modalShade').classList.remove('hidden');
+    setTimeout(()=>{$('probInput').focus();$('probInput').select()},50);
+    $('modalCancel').onclick=()=>$('modalShade').classList.add('hidden');
+    $('modalOk').onclick=()=>{
+      let n=parseInt($('probInput').value,10);
+      if(isNaN(n)||n<0)n=0;if(n>100)n=100;
+      chatSettings[key]=n;
+      $(btnId).textContent=n;
+      $('modalShade').classList.add('hidden');
+      scheduleSave();
+      toast(label+' → '+n+'%');
+    };
+  }
+  $('editTransferProb').onclick=()=>editProb('transferProb','对方发转账概率','editTransferProb');
+  $('editRedpacketProb').onclick=()=>editProb('redpacketProb','对方发红包概率','editRedpacketProb');
+  $('editRejectProb').onclick=()=>editProb('rejectProb','对方拒收概率','editRejectProb');
+}
+
+function openMore(){
+  const panel=$('settingsPanel');
+  panel.innerHTML=`<div class="settings-head">更多</div>
+    <label class="setting-label">头像</label>
+    <button class="panel-button" id="pickAvatar">选择头像图片</button>
+    <button class="panel-button" id="resetAvatar">恢复默认头像</button>
+    <label class="setting-label" for="editName">昵称</label>
+    <input class="field" id="editName" maxlength="20" value="" placeholder="对方昵称">
+    <label class="setting-label" for="editId">聊天 ID</label>
+    <input class="field" id="editId" maxlength="40" value="" placeholder="ID">
+    <label class="setting-label">聊天背景图</label>
+    <button class="panel-button" id="pickBg">选择背景图片</button>
+    <button class="panel-button" id="resetBg">恢复默认背景</button>
+    <div class="settings-head">备份与数据管理</div>
+    <button class="setting-row" id="exportData"><span class="symbol"><svg viewBox="0 0 24 24"><path d="M12 4v10"/><path d="M8 10l4 4 4-4"/><path d="M5 18h14"/></svg></span><span>备份数据<small>导出聊天记录和字卡库</small></span></button>
+    <button class="setting-row" id="importData"><span class="symbol"><svg viewBox="0 0 24 24"><path d="M12 16V6"/><path d="M8 10l4-4 4 4"/><path d="M5 18h14"/></svg></span><span>恢复备份<small>从 JSON 文件导入</small></span></button>
+    <button class="setting-row danger" id="deleteChats"><span class="symbol"><svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M6 7l1 12h10l1-12"/><path d="M10 11v5M14 11v5"/></svg></span><span>删除聊天记录<small>仅删除当前消息</small></span></button>
+    <button class="setting-row danger" id="deleteAll"><span class="symbol"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.5"/></svg></span><span>删除全部本地数据<small>清空聊天和字卡</small></span></button>
+    <div style="text-align:right;padding-top:12px">
+      <button class="panel-button" id="closeSettings">关闭</button>
+      <button class="panel-button primary" id="saveProfile">保存设置</button>
+    </div>`;
+  $('editId').value=profile.id;if($('editName'))$('editName').value=profile.name||'对方';
+  $('settingsShade').classList.remove('hidden');
+  $('closeSettings').onclick=()=>$('settingsShade').classList.add('hidden');
+  $('saveProfile').onclick=()=>{
+    profile.id=$('editId').value.trim()||'chat_id_001';
+    profile.name=($('editName')&&$('editName').value.trim())||'对方';
+    $('pid').textContent='ID: '+profile.id;
+    if($('pname'))$('pname').textContent=profile.name;
+    $('settingsShade').classList.add('hidden');
+    scheduleSave();
+    toast('设置已应用');
+  };
+  $('pickAvatar').onclick=()=>{
+    const f=document.createElement('input');f.type='file';f.accept='image/*';
+    f.onchange=()=>{let file=f.files[0];if(!file)return;let rd=new FileReader();rd.onload=()=>{profile.avatar=rd.result;document.querySelector('.person .avatar').innerHTML='<img src="'+rd.result+'" alt="头像">';scheduleSave();toast('头像已更换')};rd.readAsDataURL(file)};
+    f.click();
+  };
+  $('resetAvatar').onclick=()=>{
+    profile.avatar='';
+    document.querySelector('.person .avatar').innerHTML='<span class="icon-person"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></span>';
+    scheduleSave();toast('已恢复默认头像');
+  };
+  $('pickBg').onclick=()=>{
+    const f=document.createElement('input');f.type='file';f.accept='image/*';
+    f.onchange=()=>{let file=f.files[0];if(!file)return;let rd=new FileReader();rd.onload=()=>{profile.background=rd.result;chat.style.backgroundImage='linear-gradient(#ffffffd9,#ffffffd9),url("'+rd.result+'")';chat.style.backgroundSize='cover';chat.style.backgroundPosition='center';scheduleSave();toast('背景图已应用')};rd.readAsDataURL(file)};
+    f.click();
+  };
+  $('resetBg').onclick=()=>{profile.background='';chat.style.backgroundImage='';chat.style.background='linear-gradient(#fff,#fcfcfc)';scheduleSave();toast('已恢复默认背景')};
+  $('exportData').onclick=()=>{
+    let data={version:6,profile,msgs,cards,groups,chatSettings};
+    let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+    let url=URL.createObjectURL(blob);let a=document.createElement('a');a.href=url;
+    a.download='chat-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();
+    setTimeout(()=>URL.revokeObjectURL(url),1000);toast('备份已导出');
+  };
+  $('importData').onclick=()=>{
+    const f=document.createElement('input');f.type='file';f.accept='.json,application/json';
+    f.onchange=()=>{
+      let file=f.files[0];if(!file)return;
+      let rd=new FileReader();
+      rd.onload=()=>{
+        try{
+          let d=JSON.parse(rd.result);
+          if(!confirm('导入会替换当前聊天和字卡，确定？'))return;
+          if(Array.isArray(d.msgs)){msgs=d.msgs;seq=Math.max(0,...msgs.map(x=>Number(x.id)||0))+1}
+          if(Array.isArray(d.cards)){cards=d.cards;cardSeq=Math.max(0,...cards.map(x=>Number(x.id)||0))+1}
+          if(Array.isArray(d.groups)){groups=d.groups;if(!groups.some(g=>g.id==='public'))groups.unshift({id:'public',name:'公共（未分组）',enabled:true})}
+          filterGroup='all';
+          if(d.chatSettings)chatSettings={...chatSettings,...d.chatSettings};
+          if(d.profile)profile={...profile,...d.profile};
+          chat.querySelectorAll('.row').forEach(x=>x.remove());msgs.forEach(render);
+          $('pid').textContent='ID: '+(profile.id||'chat_id_001');if($('pname'))$('pname').textContent=profile.name||'对方';
+          if(profile.avatar)document.querySelector('.person .avatar').innerHTML='<img src="'+profile.avatar+'" alt="头像">';
+          if(profile.background){chat.style.backgroundImage='linear-gradient(#ffffffd9,#ffffffd9),url("'+profile.background+'")';chat.style.backgroundSize='cover'}
+          scroll();scheduleSave();$('settingsShade').classList.add('hidden');toast('备份已导入');
+        }catch(e){alert('备份文件格式不正确')}
+      };
+      rd.readAsText(file);
+    };
+    f.click();
+  };
+  $('deleteChats').onclick=()=>{if(confirm('确定删除全部聊天记录？')){msgs=[];chat.querySelectorAll('.row').forEach(x=>x.remove());$('settingsShade').classList.add('hidden');scheduleSave();toast('聊天记录已清空')}};
+  $('deleteAll').onclick=()=>{
+    if(confirm('确定清空聊天和字卡？')){
+      msgs=[];seq=1;cards=[];cardSeq=20;filterType='all';filterGroup='all';searchQ='';
+      if(_autoTimer){clearTimeout(_autoTimer);_autoTimer=null}hideTyping();
+      groups=[{id:'public',name:'公共（未分组）',enabled:true}];
+      profile={id:'chat_id_001',name:'对方',avatar:'',background:''};
+      chatSettings={minDelay:30,maxDelay:120,oppTransfer:true,oppRedpacket:true,transferProb:13,redpacketProb:13,cardMinCount:1,cardMaxCount:3,emojiMix:true,rejectProb:20};
+      chat.querySelectorAll('.row').forEach(x=>x.remove());
+      $('pid').textContent='ID: '+profile.id;
+      if($('pname'))$('pname').textContent=profile.name;
+      document.querySelector('.person .avatar').innerHTML='<span class="icon-person"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></span>';
+      chat.style.backgroundImage='';chat.style.background='linear-gradient(#fff,#fcfcfc)';
+      $('settingsShade').classList.add('hidden');toast('数据已清空');
+    }
+  };
+}
+
+$('more').onclick=openMore;
+$('settingsShade').onclick=e=>{if(e.target===$('settingsShade'))$('settingsShade').classList.add('hidden')};
+function openPlusMenu(){
+  const sh=$('settingsShade'),panel=$('settingsPanel');
+  panel.innerHTML=`<div class="settings-head">快捷功能</div>
+    <button class="setting-row" id="plusTransfer"><span class="symbol"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="13" height="12" rx="2.5"/><path d="M7 10.5h6M7 13.5h4"/><path d="M17 9.5l3.5 2.5L17 14.5"/></svg></span><span>转账<small>向对方发送转账</small></span></button>
+    <button class="setting-row" id="plusRedpacket"><span class="symbol"><svg viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="2.5"/><path d="M6 9h12"/><circle cx="12" cy="9" r="1.8" fill="#555" stroke="none"/></svg></span><span>红包<small>向对方发送红包</small></span></button>
+    <button class="setting-row" id="plusSettings"><span class="symbol"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v2.2M12 19.3v2.2M4.2 7.5l1.9 1.1M17.9 15.4l1.9 1.1M2.5 12h2.2M19.3 12h2.2M4.2 16.5l1.9-1.1M17.9 8.6l1.9-1.1"/></svg></span><span>设置<small>回复速度、对方转账/红包</small></span></button>
+    <button class="setting-row" id="plusCards"><span class="symbol"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg></span><span>字卡库管理<small>分组、搜索、多选、添加</small></span></button>
+    <button class="setting-row" id="plusBackup"><span class="symbol"><svg viewBox="0 0 24 24"><path d="M12 4v10"/><path d="M8 10l4 4 4-4"/><path d="M5 18h14"/></svg></span><span>备份数据<small>导出聊天与字卡</small></span></button>
+    <div style="text-align:right;padding-top:12px"><button class="panel-button" id="plusClose">关闭</button></div>`;
+  sh.classList.remove('hidden');
+  $('plusClose').onclick=()=>sh.classList.add('hidden');
+  $('plusSettings').onclick=()=>openSettings();
+  $('plusBackup').onclick=()=>{openMore();setTimeout(()=>$('exportData')?.click(),0)};
+  $('plusCards').onclick=()=>{sh.classList.add('hidden');openCardsPage()};
+  $('plusTransfer').onclick=()=>{sh.classList.add('hidden');openSendPay('transfer')};
+  $('plusRedpacket').onclick=()=>{sh.classList.add('hidden');openSendPay('redpacket')};
+}
+$('plus').onclick=openPlusMenu;
+
+/* ========== 启动：先读缓存，再渲染 ========== */
+if($('pname'))$('pname').textContent=profile.name||'对方';
+$('pid').textContent='ID: '+(profile.id||'chat_id_001');
+if(profile.avatar){
+  document.querySelector('.person .avatar').innerHTML='<img src="'+profile.avatar+'" alt="头像">';
+}
+if(profile.background){
+  chat.style.backgroundImage='linear-gradient(#ffffffd9,#ffffffd9),url("'+profile.background+'")';
+  chat.style.backgroundSize='cover';chat.style.backgroundPosition='center';
+}
+if(loadState()){
+  chat.querySelectorAll('.row').forEach(x=>x.remove());
+  msgs.forEach(render);scroll();
+}
+// 这里删除了自动添加欢迎语的逻辑，打开就是空白的
+resize();
+})();
+</script>
+<!-- ====== PWA SW 注册 ====== -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js')
+        .then(reg => console.log('PWA SW 注册成功'))
+        .catch(err => console.log('PWA SW 注册失败', err));
+    });
+  }
+</script>
+</body></html>
