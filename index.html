@@ -207,6 +207,189 @@ button{border:0;background:none;color:inherit;cursor:pointer}
 .rp-open .rp-btns button.accept{color:#C27A73;font-weight:600}
 .rp-open .rp-btns button.reject{color:#A1A9B0;border-right:1px solid #F5EEEE}
 .rp-open .rp-close{position:absolute;bottom:-48px;left:50%;transform:translateX(-50%);width:36px;height:36px;border-radius:50%;border:1.5px solid #fff;color:#fff;font-size:20px;display:grid;place-items:center}
+
+/* ================= 新增功能样式 ================= */
+.toast{z-index:70}
+#modalShade{z-index:60}
+.avatar{cursor:pointer;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.ava{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.avatar.nudge{animation:nudge .5s}
+@keyframes nudge{0%{transform:scale(1)}30%{transform:scale(.86)}60%{transform:scale(1.07)}100%{transform:scale(1)}}
+.row.sys{justify-content:center;margin:10px 0}
+.pat-line{font-size:11px;color:#a9a9b0;background:rgba(0,0,0,.035);padding:3px 11px;border-radius:10px;-webkit-user-select:none;user-select:none;text-align:center;max-width:86%}
+.mini-tip{font-size:12px;color:#9a9186;line-height:1.55;margin:0 0 10px}
+.mini-tip b{color:#6f645a;font-weight:600}
+
+/* 加号：宫格 */
+.plus-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px 6px;padding:16px 0 10px;border-bottom:1px solid #f4f4f4;margin-bottom:2px}
+.plus-item{display:flex;flex-direction:column;align-items:center;gap:7px;font-size:12px;color:#6b625a;padding:2px 0}
+.plus-item i{width:50px;height:50px;border-radius:17px;background:#f6f3ef;display:grid;place-items:center;border:1px solid #efeae4}
+.plus-item svg{width:22px;height:22px;stroke:#6b625a;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.plus-item:active i{background:#ece6df}
+
+/* 通话 */
+.call-layer{position:absolute;inset:0;z-index:45;display:none;flex-direction:column;overflow:hidden;color:#fff;touch-action:none}
+.call-layer.show{display:flex}
+.call-bg{position:absolute;inset:0;background-image:linear-gradient(165deg,#d3ccc5 0%,#b2b8c1 55%,#8f95a0 100%);background-size:cover;background-position:center}
+.call-veil{position:absolute;inset:0;background:linear-gradient(rgba(0,0,0,.30),rgba(0,0,0,.06) 38%,rgba(0,0,0,.34))}
+.call-top{position:relative;z-index:3;display:flex;align-items:center;justify-content:space-between;padding:calc(12px + env(safe-area-inset-top)) 14px 0}
+.call-top button{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.2);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);display:grid;place-items:center}
+.call-top svg,.call-bar svg{width:20px;height:20px;stroke:#fff;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.call-sub{font-size:12px;letter-spacing:.08em;opacity:.92}
+.call-mid{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;margin-top:-40px}
+.call-avatar{width:104px;height:104px;border-radius:50%;overflow:hidden;background:rgba(255,255,255,.26);border:2px solid rgba(255,255,255,.75);display:grid;place-items:center;box-shadow:0 8px 30px rgba(0,0,0,.18)}
+.call-avatar img{width:100%;height:100%;object-fit:cover}
+.call-avatar svg{width:58px;height:58px;fill:rgba(255,255,255,.88)}
+.call-layer.ringing .call-avatar{animation:callRing 1.6s infinite}
+@keyframes callRing{0%{box-shadow:0 0 0 0 rgba(255,255,255,.45)}100%{box-shadow:0 0 0 28px rgba(255,255,255,0)}}
+.call-name{font-size:21px;font-weight:600;text-shadow:0 1px 8px rgba(0,0,0,.25);max-width:80%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.call-time{font-size:14px;opacity:.94;font-variant-numeric:tabular-nums;min-height:18px}
+.call-self{position:absolute;z-index:2;right:14px;top:calc(64px + env(safe-area-inset-top));width:84px;height:116px;border-radius:14px;overflow:hidden;background:rgba(255,255,255,.24);border:1.5px solid rgba(255,255,255,.6);display:none;place-items:center}
+.call-layer.on .call-self{display:grid}
+.call-self img{width:100%;height:100%;object-fit:cover}
+.call-self svg{width:40px;height:40px;fill:rgba(255,255,255,.85)}
+.call-bar{position:relative;z-index:3;display:flex;justify-content:space-around;align-items:flex-start;padding:0 20px calc(34px + env(safe-area-inset-bottom))}
+.call-bar button{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:12px;color:#fff}
+.call-bar button i{width:58px;height:58px;border-radius:50%;background:rgba(255,255,255,.22);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);display:grid;place-items:center}
+.call-bar button.active i{background:#fff}
+.call-bar button.active svg{stroke:#555}
+.call-bar button.hang i{background:#e5544f}
+.call-pill{position:absolute;z-index:44;display:none;align-items:center;gap:8px;height:38px;padding:0 15px 0 12px;border-radius:19px;overflow:hidden;color:#fff;font-size:12px;box-shadow:0 6px 20px rgba(0,0,0,.2);touch-action:none;-webkit-user-select:none;user-select:none;cursor:grab;max-width:72%}
+.call-pill.show{display:flex}
+.call-pill .pill-bg{position:absolute;inset:0;background-image:linear-gradient(165deg,#d3ccc5,#8f95a0);background-size:cover;background-position:center}
+.call-pill .pill-veil{position:absolute;inset:0;background:rgba(0,0,0,.3)}
+.call-pill>span{position:relative;z-index:1}
+.call-pill>span{line-height:1.2}
+.pill-name{display:block;max-width:86px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600}
+.pill-time{font-variant-numeric:tabular-nums;opacity:.95}
+.pill-dot{width:7px;height:7px;border-radius:50%;background:#7ee08f;flex:none;animation:pillBlink 1.4s infinite}
+@keyframes pillBlink{0%,100%{opacity:1}50%{opacity:.3}}
+.callrec{display:inline-flex;align-items:center;gap:6px}
+.callrec svg{width:15px;height:15px;stroke:#666;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* 抉择（韩系 ins） */
+.choice-card{width:238px;background:#faf8f5;border:1px solid #ece7e1;border-radius:18px;padding:14px 14px 12px;box-shadow:0 2px 14px rgba(120,100,80,.07);color:#4a443f;-webkit-user-select:none;user-select:none}
+.choice-tag{display:flex;justify-content:space-between;font-size:9px;letter-spacing:.2em;color:#b9b0a6}
+.choice-q{font-size:14px;font-weight:600;line-height:1.45;margin:9px 0 10px;overflow-wrap:anywhere}
+.choice-opt{display:flex;align-items:center;gap:9px;padding:9px 11px;margin-top:6px;border-radius:12px;background:#fff;border:1px solid #efeae4;font-size:13px;color:#6b625a}
+.choice-opt .otxt{flex:1;min-width:0;overflow-wrap:anywhere;line-height:1.35}
+.choice-opt .dot{width:15px;height:15px;border-radius:50%;border:1.4px solid #d6cec4;flex:none;position:relative}
+.choice-opt.multi .dot{border-radius:5px}
+.choice-opt.on{background:#efe9e2;border-color:#ddd2c6;color:#4a443f;font-weight:500}
+.choice-opt.on .dot{background:#6f645a;border-color:#6f645a}
+.choice-opt.on .dot::after{content:'';position:absolute;left:4.3px;top:1.4px;width:4px;height:7px;border:solid #fff;border-width:0 1.6px 1.6px 0;transform:rotate(45deg)}
+.choice-foot{display:flex;align-items:center;gap:7px;font-size:10px;color:#b9b0a6;margin-top:11px;letter-spacing:.04em}
+.think{display:inline-flex;gap:3px}
+.think i{width:4px;height:4px;border-radius:50%;background:#c9bfb4;animation:typingBounce 1.15s infinite ease-in-out both}
+.think i:nth-child(2){animation-delay:.15s}
+.think i:nth-child(3){animation-delay:.3s}
+.seg{display:flex;background:#f1ede8;border-radius:12px;padding:3px;margin:4px 0 8px}
+.seg button{flex:1;padding:7px;border-radius:10px;font-size:13px;color:#8a8076}
+.seg button.on{background:#fff;color:#4a443f;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.opt-row{display:flex;gap:6px;align-items:center}
+.opt-row .field{margin:4px 0;flex:1;min-width:0}
+.num-row{display:flex;gap:8px;align-items:center}
+.num-row .field{margin:5px 0;text-align:center}
+
+/* 写信 */
+.letter-card{width:226px;border-radius:15px;background:#faf8f5;border:1px solid #ece7e1;padding:12px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 2px 14px rgba(120,100,80,.07);cursor:pointer;position:relative;-webkit-user-select:none;user-select:none}
+.letter-card .env{width:40px;height:40px;border-radius:13px;background:#f1ece6;display:grid;place-items:center;flex:none}
+.letter-card .env svg{width:22px;height:22px;stroke:#7a6e63;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.letter-t{font-size:13px;font-weight:600;color:#4a443f;line-height:1.3}
+.letter-s{font-size:11px;color:#b0a79d;margin-top:3px}
+.letter-card.unread::after{content:'';position:absolute;top:11px;right:12px;width:7px;height:7px;border-radius:50%;background:#e5766d}
+.letter-layer{position:absolute;inset:0;z-index:47;background:#f4f0ea;display:none;flex-direction:column}
+.letter-layer.show{display:flex}
+.letter-bar{flex:none;display:flex;align-items:center;justify-content:space-between;padding:calc(12px + env(safe-area-inset-top)) 16px 10px}
+.letter-bar h2{font-size:15px;margin:0;font-weight:600;color:#4a443f;letter-spacing:.06em}
+.letter-bar button{font-size:14px;color:#7a6e63;padding:6px 6px;min-width:40px}
+.letter-bar button.primary{color:#fff;background:#4a443f;border-radius:14px;padding:6px 14px}
+.paper{flex:1;min-height:0;overflow:auto;margin:6px 16px 12px;background-color:#fffdf9;border-radius:6px 6px 14px 14px;box-shadow:0 4px 24px rgba(120,100,80,.10);padding:0 20px 28px;background-attachment:local;background-image:repeating-linear-gradient(transparent 0,transparent 31px,#f0eae2 31px,#f0eae2 32px);line-height:32px;font-size:15px;color:#4a443f;display:flex;flex-direction:column}
+.paper.plain{background-image:none;line-height:1.4;display:block;padding-top:20px}
+.paper textarea{flex:1;width:100%;min-height:220px;border:0;outline:0;background:transparent;resize:none;font:inherit;line-height:32px;color:inherit;padding:0}
+.paper textarea::placeholder{color:#c9bfb4}
+.lw-to{font-size:12px;color:#b0a79d;letter-spacing:.06em;height:32px;line-height:32px}
+.lr-meta{font-size:12px;color:#b0a79d;letter-spacing:.06em;line-height:1.4;margin-bottom:12px}
+.paper:not(.plain) .lr-meta{height:32px;line-height:32px;margin:0}
+.letter-set{flex:none;margin:0 16px calc(14px + env(safe-area-inset-bottom));padding:12px 14px;border-radius:14px;background:#fffdf9;border:1px solid #ece7e1}
+.letter-set.collapsed{display:none}
+.lb-left{display:flex;align-items:center;gap:4px}
+.lb-left button+button{font-size:12px;color:#9a9186;background:#ece6df;border-radius:12px;padding:4px 10px;min-width:0}
+.ls-title{font-size:11px;letter-spacing:.14em;color:#b9b0a6;margin-bottom:8px}
+.ls-row{display:flex;align-items:center;gap:8px;font-size:13px;color:#6b625a;margin-top:6px}
+.ls-row span{width:64px;flex:none}
+.ls-row input{width:60px;padding:7px 4px;text-align:center;border:1px solid #e9e3dc;border-radius:10px;background:#faf8f5;color:#4a443f;font-size:14px}
+.ls-row i{font-style:normal;color:#b9b0a6}
+.ls-row em{font-style:normal;font-size:12px;color:#9a9186}
+.collage{display:flex;flex-wrap:wrap;gap:9px 5px;align-items:center}
+.piece{display:inline-block;padding:4px 9px;font-size:15px;line-height:1.4;background:#fff;box-shadow:0 1px 3px rgba(80,60,40,.16);border-radius:2px;color:#3f3a35;max-width:100%;overflow-wrap:anywhere}
+.piece.t1{background:#fff2e4}
+.piece.t2{background:#edf3f9}
+.piece.t3{background:#f7edf1}
+.piece.emo{font-size:21px;padding:1px 5px;background:transparent;box-shadow:none}
+.piece.img{padding:3px;line-height:0}
+.piece.img img{height:54px;width:auto;border-radius:2px;display:block}
+
+/* 拍一拍 */
+.pat-list{max-height:220px;overflow:auto;margin-bottom:8px}
+.pat-item{display:flex;align-items:center;gap:8px;padding:9px 2px;border-bottom:1px solid #f4f4f4;font-size:14px;color:#444}
+.pat-item span{flex:1;min-width:0;overflow-wrap:anywhere}
+.pat-add{display:flex;gap:8px;align-items:center}
+.pat-add .field{margin:0;flex:1}
+.pat-add .panel-button{margin:0;white-space:nowrap}
+
+/* ===== 黑白色系 ===== */
+.call-self{display:none!important}
+.mini-tip{color:#8a8a8a}.mini-tip b{color:#111}
+.plus-item i{background:#f4f4f4;border-color:#e8e8e8}.plus-item svg{stroke:#333}.plus-item{color:#444}
+/* 抉择 */
+.choice-card{background:#fff;border:1px solid #111;box-shadow:none;color:#111}
+.choice-tag{color:#9a9a9a}
+.choice-opt{background:#fff;border:1px solid #dcdcdc;color:#555}
+.choice-opt .dot{border-color:#bdbdbd}
+.choice-opt.on{background:#111;border-color:#111;color:#fff}
+.choice-opt.on .dot{background:#fff;border-color:#fff}
+.choice-opt.on .dot::after{border-color:#111}
+.choice-foot{color:#9a9a9a}
+.think i{background:#bdbdbd}
+.seg{background:#f0f0f0}.seg button{color:#888}.seg button.on{color:#111}
+/* 写信：我发出的 = 白底黑线；对方回复的 = 黑底白字 */
+.letter-card.mine{background:#fff;border:1px solid #111;box-shadow:none}
+.letter-card.mine .env{background:#f0f0f0}.letter-card.mine .env svg{stroke:#111}
+.letter-card.mine .letter-t{color:#111}.letter-card.mine .letter-s{color:#8a8a8a}
+.letter-card.theirs{background:#111;border:1px solid #111;box-shadow:none}
+.letter-card.theirs .env{background:#2c2c2c}.letter-card.theirs .env svg{stroke:#fff}
+.letter-card.theirs .letter-t{color:#fff}.letter-card.theirs .letter-s{color:#a8a8a8}
+.letter-card.unread::after{background:#fff}
+.letter-layer{background:#f2f2f2}
+.letter-bar h2{color:#111}.letter-bar button{color:#666}
+.letter-bar button.primary{background:#111;color:#fff}
+.lb-left button+button{background:#e4e4e4;color:#666}
+.paper{background-color:#fff;color:#111;box-shadow:0 4px 24px rgba(0,0,0,.08);background-image:repeating-linear-gradient(transparent 0,transparent 31px,#ececec 31px,#ececec 32px)}
+.paper.plain{background-color:#111;color:#fff;background-image:none;box-shadow:0 4px 24px rgba(0,0,0,.2)}
+.paper.plain .lr-meta{color:#8a8a8a}
+.paper textarea::placeholder{color:#bdbdbd}
+.lw-to,.lr-meta{color:#9a9a9a}
+.letter-set{background:#fff;border-color:#e4e4e4}
+.ls-title{color:#9a9a9a}.ls-row{color:#444}.ls-row em{color:#888}
+.ls-row input{background:#f6f6f6;border-color:#e4e4e4;color:#111}
+.piece{background:#fff;color:#111;box-shadow:0 1px 3px rgba(0,0,0,.35)}
+.piece.t1{background:#ececec}.piece.t2{background:#dcdcdc}.piece.t3{background:#f6f6f6}
+.piece.emo{background:transparent;box-shadow:none}
+
+/* 信箱 */
+.lb-tabs{flex:none;display:flex;gap:8px;padding:2px 16px 12px}
+.lb-tabs button{flex:1;padding:9px 0;border-radius:14px;background:#e4e4e4;color:#777;font-size:13px;position:relative}
+.lb-tabs button.on{background:#111;color:#fff}
+.lb-tabs em{font-style:normal;opacity:.6;margin-left:3px;font-size:12px}
+.lb-dot{position:absolute;top:8px;right:16px;width:6px;height:6px;border-radius:50%;background:#e5544f}
+.lb-list{flex:1;min-height:0;overflow:auto;padding:0 16px calc(16px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:10px}
+.lb-item{display:block;width:100%;text-align:left;border-radius:16px;padding:13px 15px;flex:none}
+.lb-item.mine{background:#fff;border:1px solid #111;color:#111}
+.lb-item.theirs{background:#111;border:1px solid #111;color:#fff}
+.lb-top{display:flex;justify-content:space-between;font-size:11px;letter-spacing:.04em;opacity:.55;margin-bottom:6px}
+.lb-pre{font-size:14px;line-height:1.5;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow-wrap:anywhere}
+.lb-item.unread .lb-st::before{content:'';display:inline-block;width:6px;height:6px;border-radius:50%;background:#fff;margin-right:6px;vertical-align:1px}
 </style>
 </head>
 <body>
@@ -303,6 +486,33 @@ button{border:0;background:none;color:inherit;cursor:pointer}
 </div>
 <div class="rp-overlay" id="rpOverlay"></div>
 <div class="lightbox" id="lightbox"><button class="close-lb" id="closeLb">×</button><img id="lbImg" src="" alt=""></div>
+<div class="call-layer" id="callLayer">
+  <div class="call-bg" id="callBgEl"></div>
+  <div class="call-veil"></div>
+  <div class="call-top">
+    <button id="callMin" aria-label="缩小"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></button>
+    <div class="call-sub" id="callSub">正在呼叫…</div>
+    <button id="callBgBtn" aria-label="通话背景"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.5"/><path d="M21 15l-5-5L5 19"/></svg></button>
+  </div>
+  <div class="call-mid">
+    <div class="call-avatar" id="callAvatar"></div>
+    <div class="call-name" id="callName"></div>
+    <div class="call-time" id="callTime"></div>
+  </div>
+  <div class="call-bar">
+    <button id="callMute"><i><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></i><span>静音</span></button>
+    <button class="hang" id="callHang"><i><svg viewBox="0 0 24 24"><path transform="rotate(135 12 12)" d="M6.6 3.5h3l1.4 4-2 1.3a11 11 0 0 0 5.2 5.2l1.3-2 4 1.4v3a2 2 0 0 1-2.2 2A16 16 0 0 1 4.6 5.7 2 2 0 0 1 6.6 3.5z"/></svg></i><span>挂断</span></button>
+    <button id="callSpk"><i><svg viewBox="0 0 24 24"><path d="M4 10v4h3.5l5 4V6l-5 4H4z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg></i><span>扬声器</span></button>
+  </div>
+</div>
+<div class="call-pill" id="callPill">
+  <div class="pill-bg" id="pillBg"></div><div class="pill-veil"></div>
+  <span class="pill-dot"></span><span class="pill-name" id="pillName"></span><span class="pill-time" id="pillTime"></span>
+</div>
+<div class="letter-layer" id="letterBox"></div>
+<div class="letter-layer" id="letterWrite"></div>
+<div class="letter-layer" id="letterRead"></div>
+<input class="file" id="callBgFile" type="file" accept="image/*">
 <div class="toast hidden" id="toast"></div>
 </div>
 
@@ -321,9 +531,10 @@ const $=x=>document.getElementById(x);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const numOr=(v,d)=>{const n=Number(v);return v===''||v==null||isNaN(n)?d:n};
 const chat=$('chat'),entry=$('entry');
+function newDefaults(){return{minDelay:30,maxDelay:120,oppTransfer:true,oppRedpacket:true,transferProb:13,redpacketProb:13,cardMinCount:1,cardMaxCount:3,emojiMix:true,rejectProb:20,patPhrases:['的小脑袋','的肩膀','并说：该睡觉啦'],chooseProb:80,chooseMinSec:3,chooseMaxSec:8,letterMinCards:3,letterMaxCards:8,letterMinHours:1,letterMaxHours:6}}
 let msgs=[],seq=1,active=null,quoted=null,editing=null,typing=null,toastTimer;
-let profile={id:'chat_id_001',name:'对方',avatar:'',myAvatar:'',background:''};
-let chatSettings={minDelay:30,maxDelay:120,oppTransfer:true,oppRedpacket:true,transferProb:13,redpacketProb:13,cardMinCount:1,cardMaxCount:3,emojiMix:true,rejectProb:20};
+let profile={id:'chat_id_001',name:'对方',avatar:'',myAvatar:'',background:'',callBg:''};
+let chatSettings=newDefaults();
 let stickerTab='stickers';
 let groups=[{id:'public',name:'公共（未分组）',enabled:true}];
 // 这里已经完全清空了默认字卡
@@ -351,7 +562,7 @@ const idb={
 function snapshot(){return {version:7,profile,msgs,cards,groups,chatSettings,seq,cardSeq}}
 /* 精简备份：昵称/ID/概率/分组等小数据，同步写入 localStorage，退后台瞬间也不会丢 */
 function saveLite(){
-  try{localStorage.setItem(LITE_KEY,JSON.stringify({profile:{...profile,avatar:'',myAvatar:'',background:''},chatSettings,groups}))}catch(e){}
+  try{localStorage.setItem(LITE_KEY,JSON.stringify({profile:{...profile,avatar:'',myAvatar:'',background:'',callBg:''},chatSettings,groups}))}catch(e){}
 }
 async function saveState(){
   if(!_booted)return;
@@ -383,7 +594,7 @@ function applyStored(d,lite){
     if(d.chatSettings)chatSettings={...chatSettings,...d.chatSettings};
   }
   if(lite){
-    if(lite.profile){const p={...lite.profile};delete p.avatar;delete p.myAvatar;delete p.background;profile={...profile,...p}}
+    if(lite.profile){const p={...lite.profile};delete p.avatar;delete p.myAvatar;delete p.background;delete p.callBg;profile={...profile,...p}}
     if(lite.chatSettings)chatSettings={...chatSettings,...lite.chatSettings};
     if(Array.isArray(lite.groups)&&lite.groups.length)groups=lite.groups;
   }
@@ -447,6 +658,14 @@ function groupName(gid){const g=groupById(gid);return g?g.name:'公共'}
 
 function render(m){
   let r=document.createElement('div');r.className='row '+(m.mine?'mine':'');r.dataset.id=m.id;
+  if(m.type==='pat'){
+    r.className='row sys';
+    const pl=document.createElement('div');pl.className='pat-line';pl.textContent=m.content;r.append(pl);
+    pl.addEventListener('contextmenu',e=>{e.preventDefault();openMenu(m.id)});
+    let h0;pl.addEventListener('touchstart',()=>h0=setTimeout(()=>openMenu(m.id),520),{passive:true});
+    ['touchend','touchmove','touchcancel'].forEach(ev=>pl.addEventListener(ev,()=>clearTimeout(h0),{passive:true}));
+    chat.append(r);return;
+  }
   function avatarStack(){
     let w=document.createElement('div');w.className='avatar-stack';
     let a=document.createElement('div');a.className='ava';
@@ -526,6 +745,29 @@ function render(m){
       }
     }
     b.append(card);
+  }
+  else if(m.type==='call'){
+    const cs=document.createElement('span');cs.className='callrec';
+    cs.innerHTML=ICON.phone;const ct=document.createElement('span');ct.textContent=m.content;cs.append(ct);b.append(cs);
+  }
+  else if(m.type==='choice'){
+    b.classList.add('pay-bubble');
+    const ans=new Set(m.answers||[]);
+    const cc=document.createElement('div');cc.className='choice-card';
+    let h='<div class="choice-tag"><span>CHOICE</span><span>'+(m.multi?'MULTIPLE':'SINGLE')+'</span></div><div class="choice-q">'+esc(m.question)+'</div>';
+    (m.options||[]).forEach((o,i)=>{h+='<div class="choice-opt'+(m.multi?' multi':'')+(ans.has(i)?' on':'')+'"><span class="dot"></span><span class="otxt">'+esc(o)+'</span></div>'});
+    h+=m.status==='answered'?'<div class="choice-foot">对方已选择</div>':'<div class="choice-foot"><span class="think"><i></i><i></i><i></i></span>对方思考中</div>';
+    cc.innerHTML=h;b.append(cc);
+  }
+  else if(m.type==='letter'){
+    b.classList.add('pay-bubble');
+    const nm=esc(profile.name||'对方');
+    const lc=document.createElement('div');let title,sub;
+    if(m.mine){title='写给「'+nm+'」的信';sub=m.status==='replied'?'已收到回信':'已寄出 · 等待回信';lc.className='letter-card mine'}
+    else{title='「'+nm+'」的回信';sub=m.opened?'已拆阅':'点击拆阅';lc.className='letter-card theirs'+(m.opened?'':' unread')}
+    lc.innerHTML='<div class="env">'+ICON.env+'</div><div><div class="letter-t">'+title+'</div><div class="letter-s">'+sub+'</div></div>';
+    lc.onclick=e=>{e.stopPropagation();openLetter(m.id)};
+    b.append(lc);
   }
   else{let s=document.createElement('span');s.textContent=m.content;b.append(s)}
   r.append(b);if(m.mine)r.append(avatarStack());
@@ -686,9 +928,10 @@ function send(){
 }
 function openMenu(id){
   let m=find(id);if(!m)return;active=id;
-  $('preview').textContent=(m.mine?'我：':'对方：')+(m.type==='image'||m.type==='sticker'?'[图片/表情包]':m.type==='transfer'?'[转账]':m.type==='redpacket'?'[红包]':m.content);
+  $('preview').textContent=(m.mine?'我：':'对方：')+(m.type==='image'||m.type==='sticker'?'[图片/表情包]':m.type==='transfer'?'[转账]':m.type==='redpacket'?'[红包]':m.type==='choice'?'[抉择] '+m.content:m.type==='letter'?'[信件]':m.type==='call'?'[通话]':m.content);
   let list=m.mine?[['↶','引用','quote'],['▢','复制','copy'],['✎','修改','edit'],['⌫','删除','delete']]:[['↶','引用','quote'],['▢','复制','copy'],['⌫','删除','delete']];
-  if(m.type==='image'||m.type==='sticker'||m.type==='emoji')list=list.filter(x=>x[2]!=='edit');
+  if(m.type!=='text')list=list.filter(x=>x[2]!=='edit');
+  if(m.type==='pat')list=list.filter(x=>x[2]==='delete');
   $('actions').innerHTML='';
   list.forEach(([ico,label,act])=>{
     let b=document.createElement('button');if(act==='delete')b.className='danger';
@@ -1168,9 +1411,9 @@ function openMore(){
     <button class="panel-button" id="pickBg">选择背景图片</button>
     <button class="panel-button" id="resetBg">恢复默认背景</button>
     <div class="settings-head">备份与数据管理</div>
-    <button class="setting-row" id="exportData"><span class="symbol"><svg viewBox="0 0 24 24"><path d="M12 4v10"/><path d="M8 10l4 4 4-4"/><path d="M5 18h14"/></svg></span><span>备份数据<small>导出聊天记录和字卡库</small></span></button>
+    <button class="setting-row" id="exportData"><span class="symbol"><svg viewBox="0 0 24 24"><path d="M12 4v10"/><path d="M8 10l4 4 4-4"/><path d="M5 18h14"/></svg></span><span>备份数据<small>聊天、信件、字卡、设置、通话背景</small></span></button>
     <button class="setting-row" id="importData"><span class="symbol"><svg viewBox="0 0 24 24"><path d="M12 16V6"/><path d="M8 10l4-4 4 4"/><path d="M5 18h14"/></svg></span><span>恢复备份<small>从 JSON 文件导入</small></span></button>
-    <button class="setting-row danger" id="deleteChats"><span class="symbol"><svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M6 7l1 12h10l1-12"/><path d="M10 11v5M14 11v5"/></svg></span><span>删除聊天记录<small>仅删除当前消息</small></span></button>
+    <button class="setting-row danger" id="deleteChats"><span class="symbol"><svg viewBox="0 0 24 24"><path d="M5 7h14M10 7V5h4v2M6 7l1 12h10l1-12"/><path d="M10 11v5M14 11v5"/></svg></span><span>删除聊天记录<small>消息、信件、通话记录一并清空</small></span></button>
     <button class="setting-row danger" id="deleteAll"><span class="symbol"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.5"/></svg></span><span>删除全部本地数据<small>清空聊天和字卡</small></span></button>
     <div style="text-align:right;padding-top:12px">
       <button class="panel-button" id="closeSettings">关闭</button>
@@ -1211,7 +1454,7 @@ function openMore(){
   };
   $('resetBg').onclick=()=>{profile.background='';applyBackground();scheduleSave();toast('已恢复默认背景')};
   $('exportData').onclick=()=>{
-    let data={version:6,profile,msgs,cards,groups,chatSettings};
+    let data={version:8,profile,msgs,cards,groups,chatSettings};
     let blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
     let url=URL.createObjectURL(blob);let a=document.createElement('a');a.href=url;
     a.download='chat-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();
@@ -1233,7 +1476,8 @@ function openMore(){
           if(d.chatSettings)chatSettings={...chatSettings,...d.chatSettings};
           if(d.profile)profile={...profile,...d.profile};
           chat.querySelectorAll('.row').forEach(x=>x.remove());msgs.forEach(render);
-          applyProfileUI();
+          applyProfileUI();applyCallBg();
+          checkLetters();msgs.filter(x=>x.type==='choice'&&x.status==='pending').forEach(x=>scheduleChoice(x,true));
           scroll();scheduleSave();$('settingsShade').classList.add('hidden');toast('备份已导入');
         }catch(e){alert('备份文件格式不正确')}
       };
@@ -1247,14 +1491,14 @@ function openMore(){
       msgs=[];seq=1;cards=[];cardSeq=20;filterType='all';filterGroup='all';searchQ='';
       if(_autoTimer){clearTimeout(_autoTimer);_autoTimer=null}hideTyping();
       groups=[{id:'public',name:'公共（未分组）',enabled:true}];
-      profile={id:'chat_id_001',name:'对方',avatar:'',myAvatar:'',background:''};
-      chatSettings={minDelay:30,maxDelay:120,oppTransfer:true,oppRedpacket:true,transferProb:13,redpacketProb:13,cardMinCount:1,cardMaxCount:3,emojiMix:true,rejectProb:20};
+      profile={id:'chat_id_001',name:'对方',avatar:'',myAvatar:'',background:'',callBg:''};
+      chatSettings=newDefaults();
       chat.querySelectorAll('.row').forEach(x=>x.remove());
       $('pid').textContent='ID: '+profile.id;
       if($('pname'))$('pname').textContent=profile.name;
       document.querySelector('.person .avatar').innerHTML='<span class="icon-person"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg></span>';
       chat.style.backgroundImage='';chat.style.background='linear-gradient(#fff,#fcfcfc)';
-      applyProfileUI();scheduleSave();$('settingsShade').classList.add('hidden');toast('数据已清空');
+      applyProfileUI();applyCallBg();resetCall();$('letterBox').classList.remove('show');scheduleSave();$('settingsShade').classList.add('hidden');toast('数据已清空');
     }
   };
 }
@@ -1263,23 +1507,410 @@ $('more').onclick=openMore;
 $('settingsShade').onclick=e=>{if(e.target===$('settingsShade'))$('settingsShade').classList.add('hidden')};
 function openPlusMenu(){
   const sh=$('settingsShade'),panel=$('settingsPanel');
-  panel.innerHTML=`<div class="settings-head">快捷功能</div>
-    <button class="setting-row" id="plusTransfer"><span class="symbol"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="13" height="12" rx="2.5"/><path d="M7 10.5h6M7 13.5h4"/><path d="M17 9.5l3.5 2.5L17 14.5"/></svg></span><span>转账<small>向对方发送转账</small></span></button>
-    <button class="setting-row" id="plusRedpacket"><span class="symbol"><svg viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="2.5"/><path d="M6 9h12"/><circle cx="12" cy="9" r="1.8" fill="#555" stroke="none"/></svg></span><span>红包<small>向对方发送红包</small></span></button>
-    <button class="setting-row" id="plusSettings"><span class="symbol"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v2.2M12 19.3v2.2M4.2 7.5l1.9 1.1M17.9 15.4l1.9 1.1M2.5 12h2.2M19.3 12h2.2M4.2 16.5l1.9-1.1M17.9 8.6l1.9-1.1"/></svg></span><span>设置<small>回复速度、对方转账/红包</small></span></button>
-    <button class="setting-row" id="plusCards"><span class="symbol"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg></span><span>字卡库管理<small>分组、搜索、多选、添加</small></span></button>
-    <button class="setting-row" id="plusBackup"><span class="symbol"><svg viewBox="0 0 24 24"><path d="M12 4v10"/><path d="M8 10l4 4 4-4"/><path d="M5 18h14"/></svg></span><span>备份数据<small>导出聊天与字卡</small></span></button>
-    <div style="text-align:right;padding-top:12px"><button class="panel-button" id="plusClose">关闭</button></div>`;
+  const item=(id,label,svg)=>'<button class="plus-item" id="'+id+'"><i><svg viewBox="0 0 24 24">'+svg+'</svg></i><span>'+label+'</span></button>';
+  panel.innerHTML='<div class="settings-head">快捷功能</div><div class="plus-grid">'+
+    item('plusTransfer','转账','<rect x="3" y="6" width="13" height="12" rx="2.5"/><path d="M7 10.5h6M7 13.5h4"/><path d="M17 9.5l3.5 2.5L17 14.5"/>')+
+    item('plusRedpacket','红包','<rect x="6" y="3" width="12" height="18" rx="2.5"/><path d="M6 9h12"/><circle cx="12" cy="9" r="1.8"/>')+
+    item('plusCall','语音通话','<path d="M6.6 3.5h3l1.4 4-2 1.3a11 11 0 0 0 5.2 5.2l1.3-2 4 1.4v3a2 2 0 0 1-2.2 2A16 16 0 0 1 4.6 5.7 2 2 0 0 1 6.6 3.5z"/>')+
+    item('plusChoice','抉择','<rect x="3.5" y="4" width="5" height="5" rx="1.5"/><path d="M12 6.5h8.5"/><rect x="3.5" y="14" width="5" height="5" rx="1.5"/><path d="M12 16.5h8.5M4.8 6.6l1.2 1.2 1.6-1.9"/>')+
+    item('plusLetter','写信 / 信箱','<rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M3.5 7.5l8.5 6 8.5-6"/>')+
+    item('plusPat','拍一拍','<path d="M9 11V6.5a1.5 1.5 0 0 1 3 0V10M12 9.5V5a1.5 1.5 0 0 1 3 0v5M15 10V7.5a1.5 1.5 0 0 1 3 0V14a6 6 0 0 1-6 6h-.5a5 5 0 0 1-4-2L4.5 14a1.4 1.4 0 0 1 2.2-1.7L9 14.5"/>')+
+    '</div>'+
+    '<button class="setting-row" id="plusSettings"><span class="symbol"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v2.2M12 19.3v2.2M4.2 7.5l1.9 1.1M17.9 15.4l1.9 1.1M2.5 12h2.2M19.3 12h2.2M4.2 16.5l1.9-1.1M17.9 8.6l1.9-1.1"/></svg></span><span>设置<small>回复速度、对方转账/红包</small></span></button>'+
+    '<button class="setting-row" id="plusCards"><span class="symbol"><svg viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg></span><span>字卡库管理<small>分组、搜索、多选、添加</small></span></button>'+
+    '<button class="setting-row" id="plusBackup"><span class="symbol"><svg viewBox="0 0 24 24"><path d="M12 4v10"/><path d="M8 10l4 4 4-4"/><path d="M5 18h14"/></svg></span><span>备份数据<small>导出聊天与字卡</small></span></button>'+
+    '<div style="text-align:right;padding-top:12px"><button class="panel-button" id="plusClose">关闭</button></div>';
   sh.classList.remove('hidden');
-  $('plusClose').onclick=()=>sh.classList.add('hidden');
+  const close=()=>sh.classList.add('hidden');
+  $('plusClose').onclick=close;
   $('plusSettings').onclick=()=>openSettings();
   $('plusBackup').onclick=()=>{openMore();setTimeout(()=>$('exportData')?.click(),0)};
-  $('plusCards').onclick=()=>{sh.classList.add('hidden');openCardsPage()};
-  $('plusTransfer').onclick=()=>{sh.classList.add('hidden');openSendPay('transfer')};
-  $('plusRedpacket').onclick=()=>{sh.classList.add('hidden');openSendPay('redpacket')};
+  $('plusCards').onclick=()=>{close();openCardsPage()};
+  $('plusTransfer').onclick=()=>{close();openSendPay('transfer')};
+  $('plusRedpacket').onclick=()=>{close();openSendPay('redpacket')};
+  $('plusCall').onclick=()=>{close();startCall()};
+  $('plusChoice').onclick=()=>{close();openChoiceCreate()};
+  $('plusLetter').onclick=()=>{close();openLetterBox()};
+  $('plusPat').onclick=()=>{close();openPatSettings()};
 }
 $('plus').onclick=openPlusMenu;
 
+/* ================= 新增功能：主动消息 / 通话 / 抉择 / 写信 / 拍一拍 ================= */
+const rand=(a,b)=>a+Math.random()*(b-a);
+const pick=arr=>arr[Math.floor(Math.random()*arr.length)];
+const clampN=(v,lo,hi,d)=>{let n=parseFloat(v);if(isNaN(n))n=d;return Math.min(hi,Math.max(lo,n))};
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function nowTime(){return new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit'})}
+function addRaw(o){const m={id:seq++,time:nowTime(),ts:Date.now(),reply:null,...o};msgs.push(m);render(m);scroll();scheduleSave();return m}
+function rerender(m){
+  const old=chat.querySelector('.row[data-id="'+m.id+'"]');
+  if(old){const ph=document.createElement('div');old.replaceWith(ph);render(m);const neu=chat.querySelector('.row[data-id="'+m.id+'"]');if(neu&&ph.parentNode)ph.replaceWith(neu)}
+  else render(m);
+}
+function buildPool(){
+  const en=new Set(groups.filter(g=>g.enabled!==false).map(g=>g.id));
+  let p=cards.filter(c=>c.enabled!==false&&en.has(c.group||'public'));
+  if(chatSettings.emojiMix===false)p=p.filter(c=>c.type==='text');
+  return p;
+}
+const ICON={
+  phone:'<svg viewBox="0 0 24 24"><path d="M6.6 3.5h3l1.4 4-2 1.3a11 11 0 0 0 5.2 5.2l1.3-2 4 1.4v3a2 2 0 0 1-2.2 2A16 16 0 0 1 4.6 5.7 2 2 0 0 1 6.6 3.5z"/></svg>',
+  env:'<svg viewBox="0 0 24 24"><rect x="3" y="5.5" width="18" height="13" rx="2.5"/><path d="M3.5 7.5l8.5 6 8.5-6"/></svg>',
+  person:'<svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>'
+};
+
+/* ---------- 1. 主动发送消息：双击顶部头像 ---------- */
+let _proBusy=false;
+function deliverCards(pool){
+  const cMin=Math.max(1,Math.min(10,parseInt(chatSettings.cardMinCount)||1));
+  const cMax=Math.max(cMin,Math.min(10,parseInt(chatSettings.cardMaxCount)||3));
+  const count=cMin+Math.floor(Math.random()*(cMax-cMin+1));
+  const picks=shuffle(pool).slice(0,count);
+  function sendOne(i){
+    if(i>=picks.length)return;
+    const c=picks[i];
+    if(c.type==='image')add(false,c.content,'sticker');
+    else if(c.type==='emoji')add(false,c.content,'emoji');
+    else add(false,c.content,'text');
+    if(i+1<picks.length){
+      showTyping();
+      setTimeout(()=>{hideTyping();sendOne(i+1)},600+Math.random()*900);
+    }
+  }
+  sendOne(0);
+}
+function proactive(){
+  if(_proBusy)return;
+  const pool=buildPool();
+  if(!pool.length){toast('字卡库是空的，先去添加字卡');return}
+  if(_autoTimer){clearTimeout(_autoTimer);_autoTimer=null}
+  _proBusy=true;
+  const av=$('personAvatar');av.classList.remove('nudge');void av.offsetWidth;av.classList.add('nudge');
+  hideTyping();showTyping();
+  setTimeout(()=>{hideTyping();_proBusy=false;deliverCards(pool)},rand(700,1600));
+}
+let _lastAvaTap=0;
+$('personAvatar').addEventListener('pointerup',()=>{
+  const t=Date.now();
+  if(t-_lastAvaTap<380){_lastAvaTap=0;proactive()}else _lastAvaTap=t;
+});
+
+/* ---------- 2. 拍一拍：双击聊天里的头像 ---------- */
+let _lastPat={k:'',t:0};
+chat.addEventListener('pointerup',e=>{
+  const ava=e.target.closest&&e.target.closest('.ava');if(!ava)return;
+  const row=ava.closest('.row');if(!row||!row.dataset.id)return;
+  const k=row.classList.contains('mine')?'me':'op',t=Date.now();
+  if(_lastPat.k===k&&t-_lastPat.t<380){_lastPat={k:'',t:0};doPat(k)}else _lastPat={k,t};
+});
+function doPat(k){
+  const phrases=(chatSettings.patPhrases||[]).filter(Boolean);
+  const ph=phrases.length?pick(phrases):'';
+  const name=profile.name||'对方';
+  addRaw({mine:true,type:'pat',content:k==='op'?('我拍了拍「'+name+'」'+ph):('我拍了拍自己'+ph)});
+  try{navigator.vibrate&&navigator.vibrate(18)}catch(e){}
+}
+function openPatSettings(){
+  const box=$('modalBox');
+  function draw(){
+    const list=(chatSettings.patPhrases=chatSettings.patPhrases||[]);
+    let h='<h3>拍一拍</h3><p class="mini-tip">双击聊天里的头像即可拍一拍。每次随机选一条短语，接在名字后面，例如：我拍了拍「'+esc(profile.name||'对方')+'」<b>'+esc(list[0]||'的小脑袋')+'</b></p><div class="pat-list">';
+    if(!list.length)h+='<div class="empty-tip" style="padding:14px">还没有短语</div>';
+    list.forEach((p,i)=>{h+='<div class="pat-item"><span>'+esc(p)+'</span><button class="tool-btn pat-del" data-i="'+i+'">×</button></div>'});
+    h+='</div><div class="pat-add"><input class="field" id="patNew" maxlength="30" placeholder="新短语，如：的小脑袋"><button class="panel-button primary" id="patAdd">添加</button></div><div class="modal-actions"><button id="modalCancel">完成</button></div>';
+    box.innerHTML=h;
+    box.querySelectorAll('.pat-del').forEach(b=>b.onclick=()=>{list.splice(+b.dataset.i,1);scheduleSave();draw()});
+    const add=()=>{const v=$('patNew').value.trim();if(!v)return toast('请输入短语');list.push(v);scheduleSave();draw();setTimeout(()=>{const n=$('patNew');n&&n.focus()},30)};
+    $('patAdd').onclick=add;
+    $('patNew').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();add()}};
+    $('modalCancel').onclick=()=>$('modalShade').classList.add('hidden');
+  }
+  draw();$('modalShade').classList.remove('hidden');
+}
+
+/* ---------- 3. 通话 ---------- */
+let call=null,pillPos=null;
+function fmtDur(s){
+  const h=Math.floor(s/3600),m=Math.floor(s%3600/60),ss=s%60,p=n=>String(n).padStart(2,'0');
+  return h?(h+':'+p(m)+':'+p(ss)):(p(m)+':'+p(ss));
+}
+function applyCallBg(){
+  const v=profile.callBg?'url("'+profile.callBg+'")':'';
+  $('callBgEl').style.backgroundImage=v;$('pillBg').style.backgroundImage=v;
+}
+function avatarHTML(src){return src?('<img src="'+esc(src)+'" alt="">'):ICON.person}
+function tickCall(){
+  if(!call)return;
+  const on=call.state==='on';
+  const txt=on?fmtDur(Math.floor((Date.now()-call.start)/1000)):'呼叫中';
+  $('callTime').textContent=on?txt:'';
+  $('callSub').textContent=on?'语音通话中':'正在呼叫…';
+  $('pillTime').textContent=txt;
+}
+function renderCallUI(){
+  const nm=profile.name||'对方';
+  $('callName').textContent=nm;$('pillName').textContent=nm;
+  $('callAvatar').innerHTML=avatarHTML(profile.avatar);
+  tickCall();
+}
+function startCall(){
+  if(call){showCall();return}
+  call={state:'ringing',start:0,mini:false};
+  const L=$('callLayer');
+  L.classList.add('show','ringing');L.classList.remove('on');
+  $('callPill').classList.remove('show');
+  $('callMute').classList.remove('active');$('callSpk').classList.remove('active');
+  applyCallBg();renderCallUI();
+  call.ring=setTimeout(()=>{
+    if(!call)return;
+    call.state='on';call.start=Date.now();
+    L.classList.remove('ringing');L.classList.add('on');tickCall();
+  },rand(2500,5000));
+  call.iv=setInterval(tickCall,1000);
+}
+function showCall(){
+  if(!call)return;
+  call.mini=false;$('callPill').classList.remove('show');$('callLayer').classList.add('show');
+}
+function placePill(){
+  const p=$('callPill'),app=p.parentElement;
+  const l=pillPos?pillPos.l:app.clientWidth-p.offsetWidth-12;
+  const t=pillPos?pillPos.t:112;
+  p.style.left=Math.max(0,Math.min(l,app.clientWidth-p.offsetWidth))+'px';
+  p.style.top=Math.max(0,Math.min(t,app.clientHeight-p.offsetHeight))+'px';
+}
+function minimizeCall(){
+  if(!call)return;
+  call.mini=true;$('callLayer').classList.remove('show');
+  $('callPill').classList.add('show');placePill();tickCall();
+}
+function endCall(){
+  if(!call)return;
+  const c=call;clearTimeout(c.ring);clearInterval(c.iv);call=null;
+  $('callLayer').classList.remove('show','ringing','on');$('callPill').classList.remove('show');
+  if(c.state==='on'){
+    const s=Math.floor((Date.now()-c.start)/1000);
+    addRaw({mine:true,type:'call',content:'通话时长 '+fmtDur(s),dur:s});
+  }else addRaw({mine:true,type:'call',content:'已取消',dur:0});
+}
+$('callMin').onclick=minimizeCall;
+$('callHang').onclick=endCall;
+$('callMute').onclick=()=>$('callMute').classList.toggle('active');
+$('callSpk').onclick=()=>$('callSpk').classList.toggle('active');
+$('callBgBtn').onclick=()=>{
+  const box=$('modalBox');
+  box.innerHTML='<h3>通话背景</h3><button class="setting-row" id="cbPick"><span class="symbol"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.5"/><path d="M21 15l-5-5L5 19"/></svg></span><span>导入背景图<small>从相册选择，小弹窗同步使用</small></span></button><button class="setting-row" id="cbReset"><span class="symbol"><svg viewBox="0 0 24 24"><path d="M4 12a8 8 0 1 0 3-6.2"/><path d="M4 4v4h4"/></svg></span><span>恢复默认背景</span></button><div class="modal-actions"><button id="modalCancel">取消</button></div>';
+  $('modalShade').classList.remove('hidden');
+  $('modalCancel').onclick=()=>$('modalShade').classList.add('hidden');
+  $('cbPick').onclick=()=>{$('modalShade').classList.add('hidden');$('callBgFile').click()};
+  $('cbReset').onclick=()=>{profile.callBg='';applyCallBg();scheduleSave();$('modalShade').classList.add('hidden');toast('已恢复默认背景')};
+};
+$('callBgFile').onchange=e=>{
+  const f=e.target.files[0];e.target.value='';
+  if(!f||!f.type.startsWith('image/'))return;
+  compressImage(f,1280,.8).then(url=>{profile.callBg=url;applyCallBg();scheduleSave();toast('通话背景已更换')});
+};
+(function(){
+  const p=$('callPill');let d=null;
+  p.addEventListener('pointerdown',e=>{
+    d={x:e.clientX,y:e.clientY,l:p.offsetLeft,t:p.offsetTop,moved:false};
+    try{p.setPointerCapture(e.pointerId)}catch(_){}
+  });
+  p.addEventListener('pointermove',e=>{
+    if(!d)return;
+    const dx=e.clientX-d.x,dy=e.clientY-d.y;
+    if(Math.abs(dx)+Math.abs(dy)>6)d.moved=true;
+    if(!d.moved)return;
+    const app=p.parentElement;
+    pillPos={l:Math.min(Math.max(0,d.l+dx),app.clientWidth-p.offsetWidth),t:Math.min(Math.max(0,d.t+dy),app.clientHeight-p.offsetHeight)};
+    p.style.left=pillPos.l+'px';p.style.top=pillPos.t+'px';
+  });
+  p.addEventListener('pointerup',()=>{if(!d)return;const moved=d.moved;d=null;if(!moved)showCall()});
+  p.addEventListener('pointercancel',()=>{d=null});
+})();
+
+/* ---------- 4. 抉择 ---------- */
+const choiceTimers=new Map();
+function scheduleChoice(m,resume){
+  if(!m||m.status!=='pending'||choiceTimers.has(m.id))return;
+  const lo=Math.max(1,numOr(chatSettings.chooseMinSec,3));
+  const hi=Math.max(lo,numOr(chatSettings.chooseMaxSec,8));
+  const delay=(resume?rand(2,5):rand(lo,hi))*1000;
+  choiceTimers.set(m.id,setTimeout(()=>{
+    choiceTimers.delete(m.id);
+    const cur=find(m.id);
+    if(cur&&cur.status==='pending')answerChoice(cur);
+  },delay));
+}
+function answerChoice(m){
+  const n=m.options.length;let ans;
+  if(m.multi){
+    const k=1+Math.floor(Math.random()*Math.max(1,n-1));
+    ans=shuffle([...Array(n).keys()]).slice(0,k).sort((a,b)=>a-b);
+  }else ans=[Math.floor(Math.random()*n)];
+  m.answers=ans;m.status='answered';rerender(m);scheduleSave();
+}
+function openChoiceCreate(){
+  const s=chatSettings;
+  const st={q:'',opts:['',''],multi:false,lo:numOr(s.chooseMinSec,3),hi:numOr(s.chooseMaxSec,8)};
+  const box=$('modalBox');
+  const sync=()=>{
+    const q=$('chQ');if(q)st.q=q.value;
+    box.querySelectorAll('.ch-opt').forEach((el,i)=>{st.opts[i]=el.value});
+    if($('chMin'))st.lo=$('chMin').value;
+    if($('chMax'))st.hi=$('chMax').value;
+  };
+  function draw(){
+    let h='<h3>发起抉择</h3><input class="field" id="chQ" maxlength="60" placeholder="想让对方选什么？" value="'+esc(st.q)+'">';
+    h+='<div class="seg"><button data-m="0" class="'+(st.multi?'':'on')+'">单选</button><button data-m="1" class="'+(st.multi?'on':'')+'">多选</button></div>';
+    st.opts.forEach((o,i)=>{
+      h+='<div class="opt-row"><input class="field ch-opt" maxlength="30" placeholder="选项 '+(i+1)+'" value="'+esc(o)+'">'+(st.opts.length>2?'<button class="tool-btn ch-del" data-i="'+i+'">×</button>':'')+'</div>';
+    });
+    if(st.opts.length<6)h+='<button class="panel-button" id="chAdd">＋ 添加选项</button>';
+    h+='<label class="setting-label">对方作答用时（秒）最快 ～ 最慢</label><div class="num-row"><input class="field" id="chMin" type="number" inputmode="numeric" min="1" value="'+esc(st.lo)+'"><span>～</span><input class="field" id="chMax" type="number" inputmode="numeric" min="1" value="'+esc(st.hi)+'"></div>';
+    h+='<div class="modal-actions"><button id="modalCancel">取消</button><button class="primary" id="modalOk">发送</button></div>';
+    box.innerHTML=h;
+    box.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{sync();st.multi=b.dataset.m==='1';draw()});
+    box.querySelectorAll('.ch-del').forEach(b=>b.onclick=()=>{sync();st.opts.splice(+b.dataset.i,1);draw()});
+    if($('chAdd'))$('chAdd').onclick=()=>{sync();st.opts.push('');draw()};
+    $('modalCancel').onclick=()=>$('modalShade').classList.add('hidden');
+    $('modalOk').onclick=()=>{
+      sync();
+      const q=st.q.trim();
+      const opts=st.opts.map(x=>x.trim()).filter(Boolean);
+      if(!q)return toast('请输入问题');
+      if(opts.length<2)return toast('至少需要两个选项');
+      s.chooseMinSec=Math.round(clampN(st.lo,1,600,3));
+      s.chooseMaxSec=Math.max(s.chooseMinSec,Math.round(clampN(st.hi,1,600,8)));
+      const m=addRaw({mine:true,type:'choice',content:q,question:q,options:opts,multi:st.multi,status:'pending',answers:[]});
+      $('modalShade').classList.add('hidden');
+      scheduleChoice(m);
+    };
+  }
+  draw();$('modalShade').classList.remove('hidden');
+  setTimeout(()=>{const q=$('chQ');q&&q.focus()},60);
+}
+
+/* ---------- 5. 写信 ---------- */
+function collageNode(pieces){
+  const wrap=document.createElement('div');wrap.className='collage';
+  (pieces||[]).forEach(p=>{
+    const el=document.createElement('span');
+    el.className='piece '+(p.k==='img'?'img':p.k==='emo'?'emo':'t'+(p.tone||0));
+    if(p.k==='img'){const im=document.createElement('img');im.src=p.v;im.alt='';el.append(im)}
+    else el.textContent=p.v;
+    el.style.transform='rotate('+(p.rot||0)+'deg) translateY('+(p.dy||0)+'px)';
+    wrap.append(el);
+  });
+  return wrap;
+}
+function openLetter(id){
+  const m=find(id);if(!m)return;
+  const L=$('letterRead');
+  const nm=profile.name||'对方';
+  const d=new Date(m.ts||Date.now()).toLocaleDateString('zh-CN',{month:'long',day:'numeric'})+' '+(m.time||'');
+  L.innerHTML='<div class="letter-bar"><span style="min-width:40px"></span><h2>'+(m.mine?'我的信':'回信')+'</h2><button id="lrClose">关闭</button></div><div class="paper'+(m.mine?'':' plain')+'" id="lrPaper"></div>';
+  const paper=$('lrPaper');
+  const meta=document.createElement('div');meta.className='lr-meta';
+  meta.textContent=m.mine?('To. '+nm+'  ·  '+d):('From. '+nm+'  ·  '+d);
+  paper.append(meta);
+  if(m.mine){
+    const t=document.createElement('div');t.style.whiteSpace='pre-wrap';t.style.overflowWrap='anywhere';t.textContent=m.content;paper.append(t);
+  }else paper.append(collageNode(m.pieces));
+  L.classList.add('show');
+  $('lrClose').onclick=()=>L.classList.remove('show');
+  if(!m.mine&&!m.opened){m.opened=true;rerender(m);scheduleSave();drawLetterBox()}
+}
+function openLetterWrite(){
+  const W=$('letterWrite'),s=chatSettings;
+  W.innerHTML='<div class="letter-bar"><div class="lb-left"><button id="lwCancel">取消</button><button id="lwSetBtn">回信设置</button></div><h2>写信</h2><button class="primary" id="lwSend">寄出</button></div>'+
+    '<div class="paper"><div class="lw-to">To. '+esc(profile.name||'对方')+'</div><textarea id="lwText" placeholder="想对 Ta 说的话，慢慢写…"></textarea></div>'+
+    '<div class="letter-set" id="lwSet"><div class="ls-title">回信设置</div>'+
+    '<div class="ls-row"><span>字卡数量</span><input id="lwCmin" type="number" inputmode="numeric" min="1" max="30" value="'+esc(numOr(s.letterMinCards,3))+'"><i>～</i><input id="lwCmax" type="number" inputmode="numeric" min="1" max="30" value="'+esc(numOr(s.letterMaxCards,8))+'"><em>张</em></div>'+
+    '<div class="ls-row"><span>回信等待</span><input id="lwHmin" type="number" inputmode="decimal" min="0" step="0.5" value="'+esc(numOr(s.letterMinHours,1))+'"><i>～</i><input id="lwHmax" type="number" inputmode="decimal" min="0" step="0.5" value="'+esc(numOr(s.letterMaxHours,6))+'"><em>小时</em></div></div>';
+  W.classList.add('show');
+  const ta=$('lwText'),setBox=$('lwSet');
+  ta.onfocus=()=>setBox.classList.add('collapsed');
+  $('lwSetBtn').onclick=()=>{
+    if(setBox.classList.contains('collapsed')){ta.blur();setBox.classList.remove('collapsed')}
+    else setBox.classList.add('collapsed');
+  };
+  $('lwCancel').onclick=()=>{if(ta.value.trim()&&!confirm('放弃这封信？'))return;W.classList.remove('show')};
+  $('lwSend').onclick=()=>{
+    const text=ta.value.trim();
+    if(!text)return toast('信还没写内容');
+    if(!buildPool().length)return toast('字卡库是空的，对方没法回信');
+    s.letterMinCards=Math.round(clampN($('lwCmin').value,1,30,3));
+    s.letterMaxCards=Math.max(s.letterMinCards,Math.round(clampN($('lwCmax').value,1,30,8)));
+    s.letterMinHours=clampN($('lwHmin').value,0,720,1);
+    s.letterMaxHours=Math.max(s.letterMinHours,clampN($('lwHmax').value,0,720,6));
+    const ms=Math.max(4000,rand(s.letterMinHours,s.letterMaxHours)*3600*1000);
+    addRaw({mine:true,type:'letter',content:text,status:'waiting',replyAt:Date.now()+ms});
+    W.classList.remove('show');toast('信已寄出');lbTab='sent';openLetterBox('sent');
+  };
+}
+function deliverLetter(m){
+  const pool=buildPool();if(!pool.length)return;
+  const cMin=Math.round(clampN(chatSettings.letterMinCards,1,30,3));
+  const cMax=Math.max(cMin,Math.round(clampN(chatSettings.letterMaxCards,1,30,8)));
+  const count=cMin+Math.floor(Math.random()*(cMax-cMin+1));
+  let bag=shuffle(pool);const picks=[];
+  while(picks.length<count){if(!bag.length)bag=shuffle(pool);picks.push(bag.pop())}
+  const pieces=picks.map(c=>({k:c.type==='image'?'img':c.type==='emoji'?'emo':'txt',v:c.content,rot:+rand(-1.6,1.6).toFixed(2),dy:Math.round(rand(-2,2)),tone:Math.floor(Math.random()*4)}));
+  m.status='replied';rerender(m);
+  addRaw({mine:false,type:'letter',content:picks.filter(c=>c.type!=='image').map(c=>c.content).join(' '),pieces,opened:false,replyTo:m.id});
+  toast('收到一封回信');drawLetterBox();
+}
+function checkLetters(){
+  const now=Date.now();
+  msgs.filter(x=>x.type==='letter'&&x.mine&&x.status==='waiting'&&x.replyAt&&now>=x.replyAt).forEach(deliverLetter);
+}
+setInterval(checkLetters,15000);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')checkLetters()});
+
+
+/* ---------- 信箱：我发出的 / 收到的 ---------- */
+let lbTab='sent';
+function letterPreview(m){
+  if(m.mine)return (m.content||'').replace(/\s+/g,' ').slice(0,60);
+  return (m.pieces||[]).map(p=>p.k==='img'?'[图]':p.v).join(' ').slice(0,60);
+}
+function drawLetterBox(){
+  const B=$('letterBox');if(!B.classList.contains('show'))return;
+  const sent=msgs.filter(x=>x.type==='letter'&&x.mine).reverse();
+  const recv=msgs.filter(x=>x.type==='letter'&&!x.mine).reverse();
+  const unread=recv.filter(x=>!x.opened).length;
+  const list=lbTab==='sent'?sent:recv;
+  B.innerHTML='<div class="letter-bar"><button id="lbClose">关闭</button><h2>信箱</h2><button class="primary" id="lbWrite">写信</button></div>'+
+    '<div class="lb-tabs"><button data-t="sent" class="'+(lbTab==='sent'?'on':'')+'">我发出的 <em>'+sent.length+'</em></button>'+
+    '<button data-t="recv" class="'+(lbTab==='recv'?'on':'')+'">收到的 <em>'+recv.length+'</em>'+(unread?'<i class="lb-dot"></i>':'')+'</button></div>'+
+    '<div class="lb-list" id="lbList"></div>';
+  const L=$('lbList');
+  if(!list.length)L.innerHTML='<div class="empty-tip">'+(lbTab==='sent'?'还没有寄出过信':'还没有收到回信')+'</div>';
+  list.forEach(m=>{
+    const it=document.createElement('button');
+    it.className='lb-item '+(m.mine?'mine':'theirs')+(!m.mine&&!m.opened?' unread':'');
+    it.innerHTML='<div class="lb-top"><span class="lb-st"></span><span class="lb-date"></span></div><div class="lb-pre"></div>';
+    it.querySelector('.lb-st').textContent=m.mine?(m.status==='replied'?'已收到回信':'等待回信'):(m.opened?'已拆阅':'未拆阅');
+    it.querySelector('.lb-date').textContent=new Date(m.ts||Date.now()).toLocaleDateString('zh-CN',{month:'numeric',day:'numeric'})+' '+(m.time||'');
+    it.querySelector('.lb-pre').textContent=(!m.mine&&!m.opened)?'点击拆阅这封回信':letterPreview(m);
+    it.onclick=()=>openLetter(m.id);
+    L.append(it);
+  });
+  B.querySelectorAll('.lb-tabs button').forEach(b=>b.onclick=()=>{lbTab=b.dataset.t;drawLetterBox()});
+  $('lbClose').onclick=()=>B.classList.remove('show');
+  $('lbWrite').onclick=openLetterWrite;
+}
+function openLetterBox(tab){
+  if(tab)lbTab=tab;
+  else lbTab=msgs.some(x=>x.type==='letter'&&!x.mine&&!x.opened)?'recv':'sent';
+  $('letterBox').classList.add('show');drawLetterBox();
+}
+function resetCall(){
+  if(call){clearTimeout(call.ring);clearInterval(call.iv);call=null}
+  $('callLayer').classList.remove('show','ringing','on');$('callPill').classList.remove('show');
+  choiceTimers.forEach(t=>clearTimeout(t));choiceTimers.clear();
+}
 /* ========== 启动：先读存储，再渲染 ========== */
 readStored().then(({d,lite})=>{
   const had=applyStored(d,lite);
@@ -1287,6 +1918,8 @@ readStored().then(({d,lite})=>{
   chat.querySelectorAll('.row').forEach(x=>x.remove());
   if(had){msgs.forEach(render);scroll()}
   applyProfileUI();
+  checkLetters();
+  msgs.filter(x=>x.type==='choice'&&x.status==='pending').forEach(x=>scheduleChoice(x,true));
   try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
 });
 resize();
