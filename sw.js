@@ -1,4 +1,4 @@
-const CACHE_NAME = 'baifog-chat-v4';
+const CACHE_NAME = 'baifog-chat-v5';
 const urlsToCache = [
   './',
   './index.html',
